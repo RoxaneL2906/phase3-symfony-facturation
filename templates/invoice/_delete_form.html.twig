@@ -1,0 +1,5 @@
+{{ include('shared/delete_modal.html.twig', {
+    deleteUrl: path('app_invoice_delete', {'id': invoice.id}),
+    csrfToken: csrf_token('delete' ~ invoice.id),
+    deleteMessage: 'Êtes-vous sûr de vouloir supprimer cette facture ?'
+}) }}

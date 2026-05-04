@@ -1,0 +1,70 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Factures{% endblock %}
+
+{% block body %}
+<div>
+    <div class="flex items-center justify-between mb-6">
+        <h1 class="text-2xl font-bold text-gray-800">Factures</h1>
+        <a href="{{ path('app_invoice_new') }}" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-4 py-2 rounded-lg flex items-center gap-2 transition">
+            + Créer une facture
+        </a>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-sm">
+        <div class="flex gap-2 p-4 border-b border-gray-100">
+            <a href="{{ path('app_invoice_index') }}" class="px-4 py-1.5 rounded-full text-sm font-medium {{ currentStatus is null ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-100' }}">Toutes</a>
+            <a href="{{ path('app_invoice_index', {'status': 'draft'}) }}" class="px-4 py-1.5 rounded-full text-sm font-medium {{ currentStatus == 'draft' ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-100' }}">Brouillons</a>
+            <a href="{{ path('app_invoice_index', {'status': 'pending_payment'}) }}" class="px-4 py-1.5 rounded-full text-sm font-medium {{ currentStatus == 'pending_payment' ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-100' }}">En attente</a>
+            <a href="{{ path('app_invoice_index', {'status': 'paid'}) }}" class="px-4 py-1.5 rounded-full text-sm font-medium {{ currentStatus == 'paid' ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-100' }}">Payées</a>
+        </div>
+
+        <table class="w-full">
+            <thead>
+                <tr class="border-b border-gray-100">
+                    <th class="text-left text-sm font-medium text-gray-500 px-6 py-4">Numéro</th>
+                    <th class="text-left text-sm font-medium text-gray-500 px-6 py-4">Date</th>
+                    <th class="text-left text-sm font-medium text-gray-500 px-6 py-4">Client</th>
+                    <th class="text-left text-sm font-medium text-gray-500 px-6 py-4">Total TTC</th>
+                    <th class="text-left text-sm font-medium text-gray-500 px-6 py-4">Statut</th>
+                    <th class="text-right text-sm font-medium text-gray-500 px-6 py-4">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for invoice in invoices %}
+                <tr class="border-b border-gray-50 hover:bg-gray-50 transition">
+                    <td class="px-6 py-4 text-sm font-medium text-gray-800">{{ invoice.number }}</td>
+                    <td class="px-6 py-4 text-sm text-gray-500">{{ invoice.createdAt|date('d/m/Y') }}</td>
+                    <td class="px-6 py-4 text-sm text-gray-500">{{ invoice.client ? invoice.client.name : '-' }}</td>
+                    <td class="px-6 py-4 text-sm text-gray-800">{{ invoice.totalTtc }} €</td>
+                    <td class="px-6 py-4">
+                        {% if invoice.status == 'draft' %}
+                            <span class="px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600">Brouillon</span>
+                        {% elseif invoice.status == 'pending_payment' %}
+                            <span class="px-2 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-600">En attente</span>
+                        {% else %}
+                            <span class="px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-600">Payée</span>
+                        {% endif %}
+                    </td>
+                    <td class="px-6 py-4">
+                        <div class="flex items-center justify-end gap-3">
+                            <a href="{{ path('app_invoice_show', {'id': invoice.id}) }}" class="text-gray-500 hover:text-gray-700 text-sm">Détails</a>
+                            {% if invoice.status == 'draft' %}
+                                <a href="{{ path('app_invoice_edit', {'id': invoice.id}) }}" class="text-blue-500 hover:text-blue-700">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                                </a>
+                                {{ include('invoice/_delete_form.html.twig') }}
+                            {% endif %}
+                        </div>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="6" class="px-6 py-8 text-center text-sm text-gray-400">Aucune facture trouvée</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

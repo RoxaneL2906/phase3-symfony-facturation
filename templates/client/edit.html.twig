@@ -3,67 +3,67 @@
 {% block title %}Modifier un client{% endblock %}
 
 {% block body %}
-<div class="max-w-2xl">
-    <div class="flex items-center justify-between mb-6">
-        <h1 class="text-2xl font-bold text-gray-800">Modifier un client</h1>
-        <a href="{{ path('app_client_index') }}" class="text-sm text-gray-500 hover:text-gray-700">← Retour</a>
-    </div>
-
-    <div class="bg-white rounded-xl shadow-sm p-8">
-        {{ form_start(form) }}
-
-        <div class="mb-4">
-            <label class="block text-sm text-gray-600 mb-1">Nom du client / Entreprise</label>
-            {{ form_widget(form.name, {'attr': {'class': 'w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500'}}) }}
-            {{ form_errors(form.name) }}
+<div class="flex justify-center">
+    <div class="w-full max-w-2xl">
+        <div class="flex items-center justify-between mb-6">
+            <h1 class="text-2xl font-bold text-gray-800">Modifier un client</h1>
+            <a href="{{ path('app_client_index') }}" class="text-sm text-gray-500 hover:text-gray-700">← Retour</a>
         </div>
+        <div class="bg-white rounded-xl shadow-sm p-8">
+            {{ form_start(form) }}
 
-        <div class="flex gap-4 mb-4">
-            <div class="flex-1">
-                <label class="block text-sm text-gray-600 mb-1">Email</label>
-                {{ form_widget(form.email, {'attr': {'class': 'w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500'}}) }}
-                {{ form_errors(form.email) }}
+            <div class="mb-4">
+                <label class="block text-sm text-gray-600 mb-1">Nom du client / Entreprise</label>
+                {{ form_widget(form.name, {'attr': {'class': 'w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500'}}) }}
+                {{ form_errors(form.name) }}
             </div>
-            <div class="flex-1">
-                <label class="block text-sm text-gray-600 mb-1">Téléphone</label>
-                {{ form_widget(form.phone, {'attr': {'class': 'w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500'}}) }}
-                {{ form_errors(form.phone) }}
+
+            <div class="flex gap-4 mb-4">
+                <div class="flex-1">
+                    <label class="block text-sm text-gray-600 mb-1">Email</label>
+                    {{ form_widget(form.email, {'attr': {'class': 'w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500'}}) }}
+                    {{ form_errors(form.email) }}
+                </div>
+                <div class="flex-1">
+                    <label class="block text-sm text-gray-600 mb-1">Téléphone</label>
+                    {{ form_widget(form.phone, {'attr': {'class': 'w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500'}}) }}
+                    {{ form_errors(form.phone) }}
+                </div>
             </div>
-        </div>
 
-        <div class="mb-4">
-            <label class="block text-sm text-gray-600 mb-1">Adresse</label>
-            {{ form_widget(form.address, {'attr': {'class': 'w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500'}}) }}
-            {{ form_errors(form.address) }}
-        </div>
-
-        <div class="flex gap-4 mb-6">
-            <div class="flex-1">
-                <label class="block text-sm text-gray-600 mb-1">SIRET (Optionnel)</label>
-                {{ form_widget(form.siret, {'attr': {'class': 'w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500'}}) }}
-                {{ form_errors(form.siret) }}
+            <div class="mb-4">
+                <label class="block text-sm text-gray-600 mb-1">Adresse</label>
+                {{ form_widget(form.address, {'attr': {'class': 'w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500'}}) }}
+                {{ form_errors(form.address) }}
             </div>
-            <div class="flex-1">
-                <label class="block text-sm text-gray-600 mb-1">RIB</label>
-                {{ form_widget(form.rib, {'attr': {'class': 'w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500'}}) }}
-                {{ form_errors(form.rib) }}
+
+            <div class="flex gap-4 mb-6">
+                <div class="flex-1">
+                    <label class="block text-sm text-gray-600 mb-1">SIRET (Optionnel)</label>
+                    {{ form_widget(form.siret, {'attr': {'class': 'w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500'}}) }}
+                    {{ form_errors(form.siret) }}
+                </div>
+                <div class="flex-1">
+                    <label class="block text-sm text-gray-600 mb-1">RIB</label>
+                    {{ form_widget(form.rib, {'attr': {'class': 'w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500'}}) }}
+                    {{ form_errors(form.rib) }}
+                </div>
             </div>
+
+            <div class="flex gap-3 justify-end">
+                <a href="{{ path('app_client_index') }}" class="px-4 py-2 text-sm text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition">
+                    Annuler
+                </a>
+                <button type="submit" class="px-4 py-2 text-sm bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition">
+                    Enregistrer
+                </button>
+            </div>
+
+            {{ form_end(form) }}
         </div>
-
-        <div class="flex gap-3 justify-end">
-            <a href="{{ path('app_client_index') }}" class="px-4 py-2 text-sm text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition">
-                Annuler
-            </a>
-            <button type="submit" class="px-4 py-2 text-sm bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition">
-                Enregistrer
-            </button>
+        <div class="mt-4 flex justify-end">
+            {{ include('client/_delete_form.html.twig') }}
         </div>
-
-        {{ form_end(form) }}
-    </div>
-
-    <div class="mt-4 flex justify-end">
-        {{ include('client/_delete_form.html.twig') }}
     </div>
 </div>
 {% endblock %}
