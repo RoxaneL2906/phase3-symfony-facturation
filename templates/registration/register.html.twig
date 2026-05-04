@@ -1,0 +1,80 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Créer un compte{% endblock %}
+
+{% block body %}
+<div class="min-h-screen bg-gray-100 flex items-center justify-center">
+    <div class="w-full max-w-md">
+
+        
+        <div class="text-center mb-6">
+            <div class="flex justify-center mb-3">
+                <div class="border-2 border-blue-600 rounded-xl p-3 text-blue-600 text-3xl font-bold w-16 h-16 flex items-center justify-center">
+                  $
+                </div>
+            </div>
+            <h1 class="text-2xl font-bold text-gray-800">Créez votre compte</h1>
+            <p class="text-gray-500 mt-1">
+                Ou <a href="{{ path('app_login') }}" class="text-blue-600 hover:underline">connectez-vous à votre compte</a>
+            </p>
+        </div>
+
+        
+        <div class="bg-white rounded-xl shadow-sm p-8">
+
+            {{ form_errors(registrationForm) }}
+            {{ form_start(registrationForm, {'attr': {'novalidate': 'novalidate'}}) }}
+
+            
+            <div class="flex gap-4 mb-4">
+                <div class="flex-1">
+                    <label class="block text-sm text-gray-600 mb-1">Prénom</label>
+                    {{ form_widget(registrationForm.firstName, {'attr': {'class': 'w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500', 'placeholder': 'Jean'}}) }}
+                    {{ form_errors(registrationForm.firstName) }}
+                </div>
+                <div class="flex-1">
+                    <label class="block text-sm text-gray-600 mb-1">Nom</label>
+                    {{ form_widget(registrationForm.lastName, {'attr': {'class': 'w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500', 'placeholder': 'Dupont'}}) }}
+                    {{ form_errors(registrationForm.lastName) }}
+                </div>
+            </div>
+
+            
+            <div class="mb-4">
+                <label class="block text-sm text-gray-600 mb-1">Raison Sociale</label>
+                {{ form_widget(registrationForm.companyName, {'attr': {'class': 'w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500', 'placeholder': 'Tech Solutions'}}) }}
+                {{ form_errors(registrationForm.companyName) }}
+            </div>
+
+            
+            <div class="mb-4">
+                <label class="block text-sm text-gray-600 mb-1">IBAN</label>
+                {{ form_widget(registrationForm.iban, {'attr': {'class': 'w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500', 'placeholder': 'FR76 1234 5678 9012 3456 7890 123'}}) }}
+                {{ form_errors(registrationForm.iban) }}
+            </div>
+
+            
+            <div class="mb-4">
+                <label class="block text-sm text-gray-600 mb-1">Adresse Email</label>
+                {{ form_widget(registrationForm.email, {'attr': {'class': 'w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500', 'placeholder': 'contact@entreprise.fr'}}) }}
+                {{ form_errors(registrationForm.email) }}
+            </div>
+
+            
+            <div class="mb-6">
+                <label class="block text-sm text-gray-600 mb-1">Mot de passe</label>
+                {{ form_widget(registrationForm.plainPassword, {'attr': {'class': 'w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500', 'placeholder': '••••••••'}}) }}
+                {{ form_errors(registrationForm.plainPassword) }}
+            </div>
+
+            
+            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-lg transition">
+                Créer mon compte
+            </button>
+
+            {{ form_end(registrationForm) }}
+        </div>
+
+    </div>
+</div>
+{% endblock %}
