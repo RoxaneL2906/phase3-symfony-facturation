@@ -1,0 +1,41 @@
+<form method="post" action="{{ deleteUrl }}" class="delete-form" style="display:inline">
+    <input type="hidden" name="_token" value="{{ csrfToken }}">
+    <button type="button" onclick="openDeleteModal(this)" class="text-red-500 hover:text-red-700 flex items-center">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+        </svg>
+    </button>
+</form>
+
+<div id="deleteModal" class="hidden fixed inset-0 flex items-center justify-center z-50" style="background-color: rgba(0,0,0,0.5);">
+    <div class="bg-white rounded-xl p-6 w-80 shadow-xl">
+        <h3 class="text-lg font-bold text-gray-800 mb-2">Confirmer la suppression</h3>
+        <p class="text-sm text-gray-500 mb-6">{{ deleteMessage ?? 'Êtes-vous sûr de vouloir supprimer cet élément ? Cette action est irréversible.' }}</p>
+        <div class="flex gap-3 justify-end">
+            <button onclick="closeDeleteModal()" class="px-4 py-2 text-sm text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition">
+                Annuler
+            </button>
+            <button id="confirmDelete" class="px-4 py-2 text-sm bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition">
+                Supprimer
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+let formToSubmit = null;
+
+function openDeleteModal(btn) {
+    formToSubmit = btn.closest('form');
+    document.getElementById('deleteModal').classList.remove('hidden');
+}
+
+function closeDeleteModal() {
+    document.getElementById('deleteModal').classList.add('hidden');
+    formToSubmit = null;
+}
+
+document.getElementById('confirmDelete').addEventListener('click', function() {
+    if (formToSubmit) formToSubmit.submit();
+});
+</script>
