@@ -48,6 +48,28 @@ final class InvoiceController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $invoice->setNumber($this->generateInvoiceNumber($invoiceRepository));
+
+            $linesData = json_decode($request->request->get('invoice_lines', '[]'), true);
+            $total = 0;
+
+            foreach ($linesData as $lineData) {
+                $product = new Product();
+                $product->setName($lineData['name']);
+                $product->setDescription('');
+                $product->setPrice($lineData['unitPrice']);
+                $product->setQuantity((int)$lineData['quantity']);
+                $product->setUnit('piece');
+                $product->setInvoice($invoice);
+                $entityManager->persist($product);
+                $total += $lineData['total'];
+            }
+
+            $action = $request->request->get('action', 'draft');
+            if ($action === 'validate') {
+                $invoice->setStatus('pending_payment');
+            }
+
+            $invoice->setTotalTtc($total);
             $entityManager->persist($invoice);
             $entityManager->flush();
 
