@@ -38,12 +38,18 @@
                 </form>
             {% endif %}
             {% if invoice.status == 'pending_payment' %}
-                <form method="post" action="{{ path('app_invoice_pay', {'id': invoice.id}) }}" style="display:inline">
+                <form method="post" action="{{ path('app_invoice_pay', {'id': invoice.id}) }}" id="payForm" style="display:inline">
                     <input type="hidden" name="_token" value="{{ csrf_token('pay' ~ invoice.id) }}">
-                    <button type="submit" class="px-4 py-2 text-sm bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition">
+                    <button type="button" onclick="openConfirmModal(document.getElementById('payForm'))" class="px-4 py-2 text-sm bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition">
                         Valider le paiement
                     </button>
                 </form>
+                {{ include('shared/confirm_modal.html.twig', {
+                    confirmTitle: 'Marquer comme payée',
+                    confirmMessage: 'Êtes-vous sûr de vouloir marquer cette facture comme payée ? Cette action est irréversible.',
+                    confirmButton: 'Confirmer le paiement',
+                    confirmClass: 'bg-green-600 hover:bg-green-700 text-white'
+                }) }}
             {% endif %}
         </div>
     </div>
