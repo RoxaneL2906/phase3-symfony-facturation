@@ -7,6 +7,7 @@ use App\Entity\Product;
 use App\Form\InvoiceType;
 use App\Repository\InvoiceRepository;
 use App\Repository\ProductRepository;
+use App\Service\PdfService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -140,6 +141,17 @@ final class InvoiceController extends AbstractController
         }
 
         return $this->redirectToRoute('app_invoice_show', ['id' => $invoice->getId()]);
+    }
+
+    #[Route('/{id}/pdf', name: 'app_invoice_pdf', methods: ['GET'])]
+    public function pdf(Invoice $invoice, PdfService $pdfService): Response
+    {
+        if ($invoice->getStatus() === 'draft') {
+            $this->addFlash('error', 'Seule une facture validée peut être téléchargée en PDF.');
+            return $this->redirectToRoute('app_invoice_show', ['id' => $invoice->getId()]);
+        }
+
+        return $pdfService->generateInvoicePdf($invoice);
     }
 
     #[Route('/{id}', name: 'app_invoice_delete', methods: ['POST'])]

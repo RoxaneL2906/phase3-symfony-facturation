@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: Arial, sans-serif; font-size: 12px; color: #333; }
+        .header { display: flex; justify-content: space-between; margin-bottom: 40px; }
+        .company { font-size: 16px; font-weight: bold; }
+        .invoice-title { font-size: 24px; font-weight: bold; text-align: right; }
+        .client-box { background: #f5f5f5; padding: 15px; margin: 20px 0 20px auto; width: 250px; }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        th { background: #f5f5f5; padding: 10px; text-align: left; border-bottom: 2px solid #ddd; }
+        td { padding: 10px; border-bottom: 1px solid #eee; }
+        .total-section { margin-left: auto; width: 250px; }
+        .total-row { display: flex; justify-content: space-between; padding: 5px 0; border-top: 1px solid #ddd; }
+        .total-ttc { font-weight: bold; font-size: 14px; }
+        .footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid #ddd; font-size: 10px; color: #666; }
+        .iban { margin-top: 10px; padding: 10px; background: #f5f5f5; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div>
+            <div class="company">{{ invoice.user.companyName }}</div>
+            <div>{{ invoice.user.firstName }} {{ invoice.user.lastName }}</div>
+            <div>{{ invoice.user.email }}</div>
+            {% if invoice.user.siret %}
+                <div>SIRET : {{ invoice.user.siret }}</div>
+            {% endif %}
+        </div>
+        <div>
+            <div class="invoice-title">FACTURE</div>
+            <div style="text-align:right">N° {{ invoice.number }}</div>
+            <div style="text-align:right">Date : {{ invoice.createdAt|date('d/m/Y') }}</div>
+        </div>
+    </div>
+
+    {% if invoice.client %}
+    <div class="client-box">
+        <div style="font-size:10px; color:#999; margin-bottom:5px">FACTURÉ À</div>
+        <div style="font-weight:bold">{{ invoice.client.name }}</div>
+        <div>{{ invoice.client.address }}</div>
+        <div>{{ invoice.client.email }}</div>
+        {% if invoice.client.siret %}
+            <div>SIRET : {{ invoice.client.siret }}</div>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    <table>
+        <thead>
+            <tr>
+                <th>Description</th>
+                <th style="text-align:center">Qté</th>
+                <th style="text-align:right">Prix unitaire</th>
+                <th style="text-align:right">Total TTC</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for product in invoice.products %}
+            <tr>
+                <td>{{ product.name }}</td>
+                <td style="text-align:center">{{ product.quantity }}</td>
+                <td style="text-align:right">{{ product.price }} €</td>
+                <td style="text-align:right">{{ product.price * product.quantity }} €</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="total-section">
+        <div class="total-row">
+            <span>Total HT</span>
+            <span>{{ invoice.totalTtc }} €</span>
+        </div>
+        <div class="total-row total-ttc">
+            <span>Total TTC</span>
+            <span>{{ invoice.totalTtc }} €</span>
+        </div>
+        <div style="font-size:10px; color:#999; text-align:right">TVA non applicable, art. 293 B du CGI</div>
+    </div>
+
+    <div class="footer">
+        <div>Conditions de paiement</div>
+        <div class="iban">
+            <div>Coordonnées bancaires pour le paiement :</div>
+            <div style="font-weight:bold">{{ invoice.user.iban }}</div>
+        </div>
+        <div style="margin-top:10px">
+            Conditions Générales de Vente : Paiement à 30 jours. Tout retard de paiement entraînera des pénalités de retard.
+        </div>
+    </div>
+</body>
+</html>
