@@ -49,11 +49,11 @@
         {{ render_chart(chart, {'style': 'max-height: 250px'}) }}
     </div>
 
-    <div class="grid grid-cols-3 gap-4">
-        <a href="{{ path('app_invoice_new') }}" class="bg-blue-50 rounded-xl p-5 flex items-center justify-between hover:bg-blue-100 transition">
+    <div class="grid grid-cols-3 gap-4 mb-4">
+        <a href="{{ path('app_invoice_new') }}" class="bg-blue-50 border border-blue-200 rounded-xl p-5 flex items-center justify-between hover:bg-blue-100 transition">
             <div>
-                <p class="text-blue-600 font-semibold">Créer une facture</p>
-                <p class="text-sm text-gray-500">Nouvelle prestation</p>
+                <p class="text-blue-900 font-bold">Créer une facture</p>
+                <p class="text-sm text-blue-500">Nouvelle prestation</p>
             </div>
             <span class="text-blue-600 text-xl">→</span>
         </a>
@@ -67,10 +67,22 @@
         <a href="{{ path('app_product_new') }}" class="bg-white rounded-xl p-5 flex items-center justify-between hover:bg-gray-50 transition shadow-sm">
             <div>
                 <p class="font-semibold text-gray-800">Créer un produit / service</p>
-                <p class="text-sm text-gray-500">Enrichir le catalogue</p>
+                <p class="text-sm text-gray-500">Enrichir le catalogue pour rédiger rapidement vos factures</p>
             </div>
             <span class="text-gray-400 text-xl">→</span>
         </a>
+    </div>
+
+    <div class="grid grid-cols-3 gap-4">
+        <form method="post" action="{{ path('app_dashboard_remind_all') }}">
+            <button type="submit" class="w-full bg-white rounded-xl p-5 flex items-center justify-between hover:bg-gray-50 transition shadow-sm text-left">
+                <div>
+                    <p class="font-semibold text-gray-800">Relancer tous les clients</p>
+                    <p class="text-sm text-gray-500">Envoyer un mail à tous les clients en retard de paiement</p>
+                </div>
+                <span class="text-gray-400 text-xl">→</span>
+            </button>
+        </form>
     </div>
 </div>
 {% endblock %}

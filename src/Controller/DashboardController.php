@@ -2,9 +2,11 @@
 
 namespace App\Controller;
 
+use App\Entity\User;
 use App\Repository\ClientRepository;
 use App\Repository\InvoiceRepository;
 use App\Repository\ProductRepository;
+use App\Service\MailService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -85,5 +87,29 @@ final class DashboardController extends AbstractController
             'year' => $year,
             'years' => $years,
         ]);
+    }
+
+    #[Route('/dashboard/remind-all', name: 'app_dashboard_remind_all', methods: ['POST'])]
+    public function remindAll(
+        InvoiceRepository $invoiceRepository,
+        MailService $mailService,
+    ): Response {
+        $user = $this->getUser();
+        assert($user instanceof User);
+
+        $pendingInvoices = $invoiceRepository->findBy(['user' => $user, 'status' => 'pending_payment']);
+
+        foreach ($pendingInvoices as $invoice) {
+            if ($invoice->getClient()) {
+                $mailService->sendReminder(
+                    $invoice,
+                    'Bonjour, je me permets de vous relancer concernant la facture ' . $invoice->getNumber() . ' qui est toujours en attente de paiement. Merci de bien vouloir procéder au règlement.' . $user->getIban()
+                );
+            }
+        }
+
+        $this->addFlash('success', count($pendingInvoices) . ' mail(s) de relance envoyé(s) !');
+
+        return $this->redirectToRoute('app_dashboard');
     }
 }

@@ -7,6 +7,7 @@ use App\Entity\Product;
 use App\Form\InvoiceType;
 use App\Repository\InvoiceRepository;
 use App\Repository\ProductRepository;
+use App\Service\MailService;
 use App\Service\PdfService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -199,6 +200,44 @@ final class InvoiceController extends AbstractController
         }
 
         return $pdfService->generateInvoicePdf($invoice);
+    }
+
+    #[Route('/{id}/send', name: 'app_invoice_send', methods: ['POST'])]
+    public function send(Invoice $invoice, MailService $mailService): Response
+    {
+        if ($invoice->getUser() !== $this->getUser()) {
+            throw $this->createAccessDeniedException();
+        }
+
+        if ($invoice->getStatus() === 'draft') {
+            $this->addFlash('error', 'Seule une facture validée peut être envoyée par mail.');
+            return $this->redirectToRoute('app_invoice_show', ['id' => $invoice->getId()]);
+        }
+
+        $mailService->sendInvoice($invoice);
+        $this->addFlash('success', 'Facture envoyée par mail à ' . $invoice->getClient()->getEmail());
+
+        return $this->redirectToRoute('app_invoice_show', ['id' => $invoice->getId()]);
+    }
+
+    #[Route('/{id}/remind', name: 'app_invoice_remind', methods: ['GET', 'POST'])]
+    public function remind(Request $request, Invoice $invoice, MailService $mailService): Response
+    {
+        if ($invoice->getUser() !== $this->getUser()) {
+            throw $this->createAccessDeniedException();
+        }
+
+        if ($request->isMethod('POST')) {
+            $message = $request->request->get('message', '');
+            $mailService->sendReminder($invoice, $message);
+            $this->addFlash('success', 'Mail de relance envoyé à ' . $invoice->getClient()->getEmail());
+            return $this->redirectToRoute('app_invoice_show', ['id' => $invoice->getId()]);
+        }
+
+        return $this->render('invoice/remind.html.twig', [
+            'invoice' => $invoice,
+            'defaultMessage' => 'Bonjour, je me permets de vous relancer concernant la facture ' . $invoice->getNumber() . ' qui est toujours en attente de paiement. Merci de bien vouloir procéder au règlement.',
+        ]);
     }
 
     #[Route('/{id}', name: 'app_invoice_delete', methods: ['POST'])]

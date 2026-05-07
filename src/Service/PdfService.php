@@ -20,4 +20,15 @@ class PdfService
             ->generate()
             ->stream();
     }
+
+    public function generateInvoicePdfContent(Invoice $invoice): string
+    {
+        $response = $this->gotenberg
+            ->html()
+            ->content('invoice/pdf.html.twig', ['invoice' => $invoice])
+            ->generate()
+            ->stream();
+
+        return $response->getContent();
+    }
 }
