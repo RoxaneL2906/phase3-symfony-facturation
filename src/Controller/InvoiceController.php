@@ -89,6 +89,10 @@ final class InvoiceController extends AbstractController
     #[Route('/{id}', name: 'app_invoice_show', methods: ['GET'])]
     public function show(Invoice $invoice): Response
     {
+        if ($invoice->getUser() !== $this->getUser()) {
+            throw $this->createAccessDeniedException();
+        }
+
         return $this->render('invoice/show.html.twig', [
             'invoice' => $invoice,
         ]);
@@ -97,6 +101,10 @@ final class InvoiceController extends AbstractController
     #[Route('/{id}/edit', name: 'app_invoice_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Invoice $invoice, EntityManagerInterface $entityManager, ProductRepository $productRepository): Response
     {
+        if ($invoice->getUser() !== $this->getUser()) {
+            throw $this->createAccessDeniedException();
+        }
+
         if ($invoice->getStatus() !== 'draft') {
             $this->addFlash('error', 'Seule une facture en brouillon peut être modifiée.');
             return $this->redirectToRoute('app_invoice_index');
@@ -149,6 +157,10 @@ final class InvoiceController extends AbstractController
     #[Route('/{id}/validate', name: 'app_invoice_validate', methods: ['POST'])]
     public function validate(Invoice $invoice, EntityManagerInterface $entityManager): Response
     {
+        if ($invoice->getUser() !== $this->getUser()) {
+            throw $this->createAccessDeniedException();
+        }
+
         if ($invoice->getStatus() === 'draft') {
             $invoice->setStatus('pending_payment');
             $entityManager->flush();
@@ -161,6 +173,10 @@ final class InvoiceController extends AbstractController
     #[Route('/{id}/pay', name: 'app_invoice_pay', methods: ['POST'])]
     public function pay(Invoice $invoice, EntityManagerInterface $entityManager): Response
     {
+        if ($invoice->getUser() !== $this->getUser()) {
+            throw $this->createAccessDeniedException();
+        }
+
         if ($invoice->getStatus() === 'pending_payment') {
             $invoice->setStatus('paid');
             $entityManager->flush();
@@ -173,6 +189,10 @@ final class InvoiceController extends AbstractController
     #[Route('/{id}/pdf', name: 'app_invoice_pdf', methods: ['GET'])]
     public function pdf(Invoice $invoice, PdfService $pdfService): Response
     {
+        if ($invoice->getUser() !== $this->getUser()) {
+            throw $this->createAccessDeniedException();
+        }
+
         if ($invoice->getStatus() === 'draft') {
             $this->addFlash('error', 'Seule une facture validée peut être téléchargée en PDF.');
             return $this->redirectToRoute('app_invoice_show', ['id' => $invoice->getId()]);
@@ -184,6 +204,10 @@ final class InvoiceController extends AbstractController
     #[Route('/{id}', name: 'app_invoice_delete', methods: ['POST'])]
     public function delete(Request $request, Invoice $invoice, EntityManagerInterface $entityManager): Response
     {
+        if ($invoice->getUser() !== $this->getUser()) {
+            throw $this->createAccessDeniedException();
+        }
+
         if ($invoice->getStatus() !== 'draft') {
             $this->addFlash('error', 'Seule une facture en brouillon peut être supprimée.');
             return $this->redirectToRoute('app_invoice_index');
