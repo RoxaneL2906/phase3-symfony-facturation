@@ -12,47 +12,47 @@
                 <span class="text-green-600 font-bold">€</span>
             </div>
             <p class="text-sm text-gray-500">Chiffre d'affaires (Payé)</p>
-            <p class="text-2xl font-bold text-gray-800 mt-1">0 €</p>
+            <p class="text-2xl font-bold text-gray-800 mt-1">{{ totalCa }} €</p>
         </div>
         <div class="bg-white rounded-xl shadow-sm p-5">
             <div class="w-10 h-10 rounded-lg bg-orange-100 flex items-center justify-center mb-3">
                 <span class="text-orange-600 font-bold">📄</span>
             </div>
             <p class="text-sm text-gray-500">Factures en attente de paiement</p>
-            <p class="text-2xl font-bold text-gray-800 mt-1">0</p>
+            <p class="text-2xl font-bold text-gray-800 mt-1">{{ pendingInvoices }}</p>
         </div>
         <div class="bg-white rounded-xl shadow-sm p-5">
             <div class="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center mb-3">
                 <span class="text-blue-600 font-bold">👥</span>
             </div>
             <p class="text-sm text-gray-500">Total Clients</p>
-            <p class="text-2xl font-bold text-gray-800 mt-1">0</p>
+            <p class="text-2xl font-bold text-gray-800 mt-1">{{ totalClients }}</p>
         </div>
         <div class="bg-white rounded-xl shadow-sm p-5">
             <div class="w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center mb-3">
                 <span class="text-purple-600 font-bold">📦</span>
             </div>
             <p class="text-sm text-gray-500">Total Produits</p>
-            <p class="text-2xl font-bold text-gray-800 mt-1">0</p>
+            <p class="text-2xl font-bold text-gray-800 mt-1">{{ totalProducts }}</p>
         </div>
     </div>
 
     <div class="grid grid-cols-3 gap-4">
-        <a href="#" class="bg-blue-50 rounded-xl p-5 flex items-center justify-between hover:bg-blue-100 transition">
+        <a href="{{ path('app_invoice_new') }}" class="bg-blue-50 rounded-xl p-5 flex items-center justify-between hover:bg-blue-100 transition">
             <div>
                 <p class="text-blue-600 font-semibold">Créer une facture</p>
                 <p class="text-sm text-gray-500">Nouvelle prestation</p>
             </div>
             <span class="text-blue-600 text-xl">→</span>
         </a>
-        <a href="#" class="bg-white rounded-xl p-5 flex items-center justify-between hover:bg-gray-50 transition shadow-sm">
+        <a href="{{ path('app_client_new') }}" class="bg-white rounded-xl p-5 flex items-center justify-between hover:bg-gray-50 transition shadow-sm">
             <div>
                 <p class="font-semibold text-gray-800">Ajouter un client</p>
                 <p class="text-sm text-gray-500">Gérer le répertoire</p>
             </div>
             <span class="text-gray-400 text-xl">→</span>
         </a>
-        <a href="#" class="bg-white rounded-xl p-5 flex items-center justify-between hover:bg-gray-50 transition shadow-sm">
+        <a href="{{ path('app_product_new') }}" class="bg-white rounded-xl p-5 flex items-center justify-between hover:bg-gray-50 transition shadow-sm">
             <div>
                 <p class="font-semibold text-gray-800">Créer un produit / service</p>
                 <p class="text-sm text-gray-500">Enrichir le catalogue</p>
