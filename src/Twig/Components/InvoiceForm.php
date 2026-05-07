@@ -2,15 +2,21 @@
 
 namespace App\Twig\Components;
 
+use App\Entity\Client;
 use App\Entity\Invoice;
 use App\Entity\Product;
+use App\Repository\ClientRepository;
+use App\Repository\InvoiceRepository;
 use App\Repository\ProductRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
 use Symfony\UX\LiveComponent\Attribute\LiveAction;
+use Symfony\UX\LiveComponent\Attribute\LiveArg;
 use Symfony\UX\LiveComponent\Attribute\LiveProp;
 use Symfony\UX\LiveComponent\DefaultActionTrait;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\Routing\RouterInterface;
 
 #[AsLiveComponent]
 final class InvoiceForm
@@ -29,18 +35,41 @@ final class InvoiceForm
     #[LiveProp(writable: true)]
     public float $unitPrice = 0;
 
-    #[LiveProp]
+    #[LiveProp(writable: true)]
     public array $lines = [];
+
+    #[LiveProp(writable: true)]
+    public int $selectedClientId = 0;
+
+    #[LiveProp(writable: true)]
+    public string $invoiceDate = '';
 
     public function __construct(
         private ProductRepository $productRepository,
+        private ClientRepository $clientRepository,
+        private InvoiceRepository $invoiceRepository,
         private EntityManagerInterface $em,
         private Security $security,
+        private RouterInterface $router,
     ) {}
+
+    public function mount(Invoice $invoice): void
+    {
+        $this->invoice = $invoice;
+        $this->invoiceDate = (new \DateTimeImmutable())->format('Y-m-d');
+        if ($invoice->getClient()) {
+            $this->selectedClientId = $invoice->getClient()->getId();
+        }
+    }
 
     public function getAvailableProducts(): array
     {
         return $this->productRepository->findBy(['invoice' => null]);
+    }
+
+    public function getAvailableClients(): array
+    {
+        return $this->clientRepository->findBy(['user' => $this->security->getUser()]);
     }
 
     public function getTotal(): float
@@ -72,8 +101,58 @@ final class InvoiceForm
     }
 
     #[LiveAction]
-    public function removeLine(int $index): void
+    public function removeLine(#[LiveArg] int $index): void
     {
         array_splice($this->lines, $index, 1);
+    }
+
+    #[LiveAction]
+    public function save(#[LiveArg] string $action = 'draft'): RedirectResponse
+    {
+        $client = $this->clientRepository->find($this->selectedClientId);
+        $isNew = !$this->invoice->getId();
+
+        if ($isNew) {
+            $now = new \DateTimeImmutable($this->invoiceDate);
+            $count = $this->invoiceRepository->countByMonth((int)$now->format('Y'), (int)$now->format('m'));
+            $this->invoice->setNumber(sprintf('FACT-%s%s-%d', $now->format('Y'), $now->format('m'), $count + 1));
+            $this->invoice->setStatus('draft');
+            $this->invoice->setCreatedAt($now);
+            $this->invoice->setTotalTtc(0);
+            $this->invoice->setUser($this->security->getUser());
+            $this->invoice->setClient($client);
+            $this->em->persist($this->invoice);
+            $this->em->flush();
+        } else {
+            $this->invoice->setClient($client);
+            $this->invoice->setCreatedAt(new \DateTimeImmutable($this->invoiceDate));
+        }
+
+        foreach ($this->invoice->getProducts() as $product) {
+            $this->em->remove($product);
+        }
+        $this->em->flush();
+
+        $total = 0;
+        foreach ($this->lines as $lineData) {
+            $product = new Product();
+            $product->setName($lineData['name']);
+            $product->setDescription('');
+            $product->setPrice($lineData['unitPrice']);
+            $product->setQuantity((int)$lineData['quantity']);
+            $product->setUnit('piece');
+            $product->setInvoice($this->invoice);
+            $this->em->persist($product);
+            $total += $lineData['total'];
+        }
+
+        if ($action === 'validate') {
+            $this->invoice->setStatus('pending_payment');
+        }
+
+        $this->invoice->setTotalTtc($total);
+        $this->em->flush();
+
+        return new RedirectResponse($this->router->generate('app_invoice_show', ['id' => $this->invoice->getId()]));
     }
 }

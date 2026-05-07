@@ -1,0 +1,32 @@
+<div id="confirmModal" class="hidden fixed inset-0 flex items-center justify-center z-50" style="background-color: rgba(0,0,0,0.5);">
+    <div class="bg-white rounded-xl p-6 w-80 shadow-xl">
+        <h3 class="text-lg font-bold text-gray-800 mb-2">{{ confirmTitle ?? 'Confirmer l\'action' }}</h3>
+        <p class="text-sm text-gray-500 mb-6">{{ confirmMessage ?? 'Êtes-vous sûr de vouloir effectuer cette action ?' }}</p>
+        <div class="flex gap-3 justify-end">
+            <button onclick="closeConfirmModal()" class="px-4 py-2 text-sm text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition">
+                Annuler
+            </button>
+            <button id="confirmAction" class="px-4 py-2 text-sm font-semibold rounded-lg transition {{ confirmClass ?? 'bg-blue-600 hover:bg-blue-700 text-white' }}">
+                {{ confirmButton ?? 'Confirmer' }}
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+let formToConfirm = null;
+
+function openConfirmModal(form) {
+    formToConfirm = form;
+    document.getElementById('confirmModal').classList.remove('hidden');
+}
+
+function closeConfirmModal() {
+    document.getElementById('confirmModal').classList.add('hidden');
+    formToConfirm = null;
+}
+
+document.getElementById('confirmAction').addEventListener('click', function() {
+    if (formToConfirm) formToConfirm.submit();
+});
+</script>
