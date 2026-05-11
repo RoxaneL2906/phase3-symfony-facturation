@@ -17,11 +17,18 @@ class MailService
     {
         $pdfContent = $this->pdfService->generateInvoicePdfContent($invoice);
 
+        $html = '
+            <p>Bonjour,</p>
+            <p>Veuillez trouver ci-joint votre facture <strong>' . $invoice->getNumber() . '</strong>.</p>
+            <br>
+            <p>Cordialement,<br><strong>FacturSaaS</strong></p>
+        ';
+
         $email = (new Email())
             ->from('noreply@factursaas.fr')
             ->to($invoice->getClient()->getEmail())
             ->subject('Votre facture ' . $invoice->getNumber())
-            ->text('Veuillez trouver ci-joint votre facture ' . $invoice->getNumber() . '.')
+            ->html($html)
             ->attach($pdfContent, $invoice->getNumber() . '.pdf', 'application/pdf');
 
         $this->mailer->send($email);
@@ -31,11 +38,17 @@ class MailService
     {
         $pdfContent = $this->pdfService->generateInvoicePdfContent($invoice);
 
+        $html = '
+            <p>' . nl2br(htmlspecialchars($message)) . '</p>
+            <br>
+            <p>Cordialement,<br><strong>FacturSaaS</strong></p>
+        ';
+
         $email = (new Email())
             ->from('noreply@factursaas.fr')
             ->to($invoice->getClient()->getEmail())
             ->subject('Relance - Facture ' . $invoice->getNumber())
-            ->text($message)
+            ->html($html)
             ->attach($pdfContent, $invoice->getNumber() . '.pdf', 'application/pdf');
 
         $this->mailer->send($email);

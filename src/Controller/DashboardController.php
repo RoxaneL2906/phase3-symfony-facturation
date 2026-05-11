@@ -103,7 +103,13 @@ final class DashboardController extends AbstractController
             if ($invoice->getClient()) {
                 $mailService->sendReminder(
                     $invoice,
-                    'Bonjour, je me permets de vous relancer concernant la facture ' . $invoice->getNumber() . ' qui est toujours en attente de paiement. Merci de bien vouloir procéder au règlement.' . $user->getIban()
+                    'Bonjour,
+
+Je me permets de vous relancer concernant la facture ' . $invoice->getNumber() . ' qui est toujours en attente de paiement.
+
+Merci de bien vouloir procéder au règlement.
+
+Coordonnées bancaires : ' . $user->getIban()
                 );
             }
         }

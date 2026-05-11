@@ -236,7 +236,13 @@ final class InvoiceController extends AbstractController
 
         return $this->render('invoice/remind.html.twig', [
             'invoice' => $invoice,
-            'defaultMessage' => 'Bonjour, je me permets de vous relancer concernant la facture ' . $invoice->getNumber() . ' qui est toujours en attente de paiement. Merci de bien vouloir procéder au règlement.',
+            'defaultMessage' => 'Bonjour,
+
+Je me permets de vous relancer concernant la facture ' . $invoice->getNumber() . ' qui est toujours en attente de paiement.
+
+Merci de bien vouloir procéder au règlement.
+
+Coordonnées bancaires : ' . $invoice->getUser()->getIban(),
         ]);
     }
 
