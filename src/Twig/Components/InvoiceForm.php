@@ -2,7 +2,6 @@
 
 namespace App\Twig\Components;
 
-use App\Entity\Client;
 use App\Entity\Invoice;
 use App\Entity\Product;
 use App\Repository\ClientRepository;
@@ -56,9 +55,22 @@ final class InvoiceForm
     public function mount(Invoice $invoice): void
     {
         $this->invoice = $invoice;
-        $this->invoiceDate = (new \DateTimeImmutable())->format('Y-m-d');
+        $this->invoiceDate = $invoice->getCreatedAt()
+            ? $invoice->getCreatedAt()->format('Y-m-d')
+            : (new \DateTimeImmutable())->format('Y-m-d');
+
         if ($invoice->getClient()) {
             $this->selectedClientId = $invoice->getClient()->getId();
+        }
+
+        foreach ($invoice->getProducts() as $product) {
+            $this->lines[] = [
+                'productId' => $product->getId(),
+                'name' => $product->getName(),
+                'quantity' => $product->getQuantity(),
+                'unitPrice' => $product->getPrice(),
+                'total' => $product->getQuantity() * $product->getPrice(),
+            ];
         }
     }
 
