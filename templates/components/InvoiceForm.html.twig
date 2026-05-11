@@ -12,6 +12,9 @@
                         </option>
                     {% endfor %}
                 </select>
+                {% if error %}
+                    <p class="text-red-500 text-sm mt-1">{{ error }}</p>
+                {% endif %}
             </div>
             <div class="flex-1">
                 <label class="block text-sm text-gray-600 mb-1">Date de la facture</label>
@@ -54,29 +57,55 @@
             </tbody>
         </table>
 
-        <div class="flex gap-3 items-end border-t border-gray-100 pt-4">
-            <div class="flex-1">
-                <label class="block text-sm text-gray-600 mb-1">Sélectionner un produit</label>
-                <select data-model="selectedProductId" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    <option value="0">-- Choisir un produit --</option>
-                    {% for product in this.availableProducts %}
-                        <option value="{{ product.id }}" data-price="{{ product.price }}">
-                            {{ product.name }} - {{ product.price }} €/{{ product.unit }}
-                        </option>
-                    {% endfor %}
-                </select>
+        <div class="border-t border-gray-100 pt-4">
+            <div class="flex gap-3 items-end mb-3">
+                <div class="flex-1">
+                    <label class="block text-sm text-gray-600 mb-1">Sélectionner un produit du catalogue</label>
+                    <select data-model="selectedProductId" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="0">-- Choisir un produit --</option>
+                        {% for product in this.availableProducts %}
+                            <option value="{{ product.id }}" data-price="{{ product.price }}">
+                                {{ product.name }} - {{ product.price }} €/{{ product.unit }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="w-24">
+                    <label class="block text-sm text-gray-600 mb-1">Quantité</label>
+                    <input type="number" data-model="quantity" value="{{ quantity }}" min="1" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div class="w-32">
+                    <label class="block text-sm text-gray-600 mb-1">Prix unitaire (€)</label>
+                    <input type="number" data-model="unitPrice" value="{{ unitPrice }}" step="0.01" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <button type="button" data-action="click->live#action" data-live-action-param="addLine" class="bg-gray-800 hover:bg-gray-900 text-white text-sm font-semibold px-4 py-2 rounded-lg transition">
+                    + Ajouter
+                </button>
             </div>
-            <div class="w-24">
-                <label class="block text-sm text-gray-600 mb-1">Quantité</label>
-                <input type="number" data-model="quantity" value="{{ quantity }}" min="1" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+
+            <div class="flex items-center gap-3 mb-3">
+                <div class="flex-1 border-t border-gray-200"></div>
+                <span class="text-xs text-gray-400">ou saisir manuellement</span>
+                <div class="flex-1 border-t border-gray-200"></div>
             </div>
-            <div class="w-32">
-                <label class="block text-sm text-gray-600 mb-1">Prix unitaire (€)</label>
-                <input type="number" data-model="unitPrice" value="{{ unitPrice }}" step="0.01" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+
+            <div class="flex gap-3 items-end">
+                <div class="flex-1">
+                    <label class="block text-sm text-gray-600 mb-1">Nom du produit / service</label>
+                    <input type="text" data-model="manualName" value="{{ manualName }}" placeholder="Ex: Développement web, Conseil..." class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div class="w-24">
+                    <label class="block text-sm text-gray-600 mb-1">Quantité</label>
+                    <input type="number" data-model="manualQuantity" value="{{ manualQuantity }}" min="1" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div class="w-32">
+                    <label class="block text-sm text-gray-600 mb-1">Prix unitaire (€)</label>
+                    <input type="number" data-model="manualUnitPrice" value="{{ manualUnitPrice }}" step="0.01" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <button type="button" data-action="click->live#action" data-live-action-param="addLine" class="bg-gray-800 hover:bg-gray-900 text-white text-sm font-semibold px-4 py-2 rounded-lg transition">
+                    + Ajouter
+                </button>
             </div>
-            <button type="button" data-action="click->live#action" data-live-action-param="addLine" class="bg-gray-800 hover:bg-gray-900 text-white text-sm font-semibold px-4 py-2 rounded-lg transition">
-                + Ajouter
-            </button>
         </div>
 
         <div class="flex justify-end mt-4">
