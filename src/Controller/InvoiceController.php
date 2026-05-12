@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Invoice;
 use App\Entity\Product;
 use App\Form\InvoiceType;
+use App\Repository\ClientRepository;
 use App\Repository\InvoiceRepository;
 use App\Repository\ProductRepository;
 use App\Service\MailService;
@@ -21,21 +22,33 @@ use Symfony\Component\Routing\Attribute\Route;
 final class InvoiceController extends AbstractController
 {
     #[Route(name: 'app_invoice_index', methods: ['GET'])]
-    public function index(InvoiceRepository $invoiceRepository, Request $request): Response
+    public function index(InvoiceRepository $invoiceRepository, ClientRepository $clientRepository, Request $request): Response
     {
         $status = $request->query->get('status');
         $user = $this->getUser();
         $page = $request->query->getInt('page', 1);
 
-        $qb = $invoiceRepository->createUserQueryBuilder($user, $status);
+        $filters = [
+            'client' => $request->query->get('client'),
+            'month' => $request->query->get('month'),
+            'year' => $request->query->get('year'),
+            'date_from' => $request->query->get('date_from'),
+            'date_to' => $request->query->get('date_to'),
+        ];
+
+        $qb = $invoiceRepository->createUserQueryBuilder($user, $status, $filters);
 
         $pagerfanta = new Pagerfanta(new QueryAdapter($qb));
         $pagerfanta->setMaxPerPage(10);
         $pagerfanta->setCurrentPage($page);
 
+        $clients = $clientRepository->findBy(['user' => $user], ['name' => 'ASC']);
+
         return $this->render('invoice/index.html.twig', [
             'invoices' => $pagerfanta,
             'currentStatus' => $status,
+            'filters' => $filters,
+            'clients' => $clients,
         ]);
     }
 

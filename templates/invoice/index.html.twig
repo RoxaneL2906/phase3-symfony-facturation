@@ -3,6 +3,13 @@
 {% block title %}Factures{% endblock %}
 
 {% block body %}
+{% set activeFilters = {} %}
+{% for key, value in filters %}
+    {% if value is not empty %}
+        {% set activeFilters = activeFilters|merge({(key): value}) %}
+    {% endif %}
+{% endfor %}
+
 <div>
     <div class="flex items-center justify-between mb-6">
         <h1 class="text-2xl font-bold text-gray-800">Factures</h1>
@@ -11,12 +18,75 @@
         </a>
     </div>
 
+    <div class="bg-white rounded-xl shadow-sm mb-4 p-4">
+        <form method="get" action="{{ path('app_invoice_index') }}" id="filterForm" class="flex flex-wrap gap-3 items-end">
+            {% if currentStatus %}
+                <input type="hidden" name="status" value="{{ currentStatus }}">
+            {% endif %}
+
+            <div>
+                <label class="block text-xs text-gray-500 mb-1">Client</label>
+                <select name="client" onchange="document.getElementById('filterForm').submit()" class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <option value="">Tous les clients</option>
+                    {% for client in clients %}
+                        <option value="{{ client.id }}" {% if filters.client == (client.id ~ '') %}selected{% endif %}>
+                            {{ client.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div>
+                <label class="block text-xs text-gray-500 mb-1">Mois</label>
+                <select name="month" onchange="document.getElementById('filterForm').submit()" class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <option value="">Tous les mois</option>
+                    <option value="01" {% if filters.month == '01' %}selected{% endif %}>Janvier</option>
+                    <option value="02" {% if filters.month == '02' %}selected{% endif %}>Février</option>
+                    <option value="03" {% if filters.month == '03' %}selected{% endif %}>Mars</option>
+                    <option value="04" {% if filters.month == '04' %}selected{% endif %}>Avril</option>
+                    <option value="05" {% if filters.month == '05' %}selected{% endif %}>Mai</option>
+                    <option value="06" {% if filters.month == '06' %}selected{% endif %}>Juin</option>
+                    <option value="07" {% if filters.month == '07' %}selected{% endif %}>Juillet</option>
+                    <option value="08" {% if filters.month == '08' %}selected{% endif %}>Août</option>
+                    <option value="09" {% if filters.month == '09' %}selected{% endif %}>Septembre</option>
+                    <option value="10" {% if filters.month == '10' %}selected{% endif %}>Octobre</option>
+                    <option value="11" {% if filters.month == '11' %}selected{% endif %}>Novembre</option>
+                    <option value="12" {% if filters.month == '12' %}selected{% endif %}>Décembre</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="block text-xs text-gray-500 mb-1">Année</label>
+                <select name="year" onchange="document.getElementById('filterForm').submit()" class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <option value="">Toutes les années</option>
+                    {% for year in range('now'|date('Y'), 'now'|date('Y') - 4) %}
+                        <option value="{{ year }}" {% if filters.year == (year ~ '') %}selected{% endif %}>{{ year }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div>
+                <label class="block text-xs text-gray-500 mb-1">Du</label>
+                <input type="date" name="date_from" value="{{ filters.date_from }}" onchange="document.getElementById('filterForm').submit()" class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+
+            <div>
+                <label class="block text-xs text-gray-500 mb-1">Au</label>
+                <input type="date" name="date_to" value="{{ filters.date_to }}" onchange="document.getElementById('filterForm').submit()" class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+
+            <a href="{{ path('app_invoice_index', currentStatus ? {'status': currentStatus} : {}) }}" class="px-4 py-2 text-sm text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition">
+                Réinitialiser
+            </a>
+        </form>
+    </div>
+
     <div class="bg-white rounded-xl shadow-sm">
         <div class="flex gap-2 p-4 border-b border-gray-100">
-            <a href="{{ path('app_invoice_index') }}" class="px-4 py-1.5 rounded-full text-sm font-medium {{ currentStatus is null ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-100' }}">Toutes</a>
-            <a href="{{ path('app_invoice_index', {'status': 'draft'}) }}" class="px-4 py-1.5 rounded-full text-sm font-medium {{ currentStatus == 'draft' ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-100' }}">Brouillons</a>
-            <a href="{{ path('app_invoice_index', {'status': 'pending_payment'}) }}" class="px-4 py-1.5 rounded-full text-sm font-medium {{ currentStatus == 'pending_payment' ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-100' }}">En attente</a>
-            <a href="{{ path('app_invoice_index', {'status': 'paid'}) }}" class="px-4 py-1.5 rounded-full text-sm font-medium {{ currentStatus == 'paid' ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-100' }}">Payées</a>
+            <a href="{{ path('app_invoice_index', activeFilters) }}" class="px-4 py-1.5 rounded-full text-sm font-medium {{ currentStatus is null ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-100' }}">Toutes</a>
+            <a href="{{ path('app_invoice_index', {'status': 'draft'}|merge(activeFilters)) }}" class="px-4 py-1.5 rounded-full text-sm font-medium {{ currentStatus == 'draft' ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-100' }}">Brouillons</a>
+            <a href="{{ path('app_invoice_index', {'status': 'pending_payment'}|merge(activeFilters)) }}" class="px-4 py-1.5 rounded-full text-sm font-medium {{ currentStatus == 'pending_payment' ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-100' }}">En attente</a>
+            <a href="{{ path('app_invoice_index', {'status': 'paid'}|merge(activeFilters)) }}" class="px-4 py-1.5 rounded-full text-sm font-medium {{ currentStatus == 'paid' ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-100' }}">Payées</a>
         </div>
 
         <table class="w-full">
@@ -74,17 +144,17 @@
             </p>
             <div class="flex gap-2">
                 {% if invoices.hasPreviousPage %}
-                    <a href="{{ path('app_invoice_index', {'page': invoices.previousPage, 'status': currentStatus}) }}" class="px-3 py-1.5 text-sm text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition">
+                    <a href="{{ path('app_invoice_index', {'page': invoices.previousPage, 'status': currentStatus}|merge(activeFilters)) }}" class="px-3 py-1.5 text-sm text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition">
                         ← Précédent
                     </a>
                 {% endif %}
                 {% for page in range(1, invoices.nbPages) %}
-                    <a href="{{ path('app_invoice_index', {'page': page, 'status': currentStatus}) }}" class="px-3 py-1.5 text-sm rounded-lg transition {{ page == invoices.currentPage ? 'bg-blue-600 text-white' : 'text-gray-600 border border-gray-300 hover:bg-gray-50' }}">
+                    <a href="{{ path('app_invoice_index', {'page': page, 'status': currentStatus}|merge(activeFilters)) }}" class="px-3 py-1.5 text-sm rounded-lg transition {{ page == invoices.currentPage ? 'bg-blue-600 text-white' : 'text-gray-600 border border-gray-300 hover:bg-gray-50' }}">
                         {{ page }}
                     </a>
                 {% endfor %}
                 {% if invoices.hasNextPage %}
-                    <a href="{{ path('app_invoice_index', {'page': invoices.nextPage, 'status': currentStatus}) }}" class="px-3 py-1.5 text-sm text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition">
+                    <a href="{{ path('app_invoice_index', {'page': invoices.nextPage, 'status': currentStatus}|merge(activeFilters)) }}" class="px-3 py-1.5 text-sm text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition">
                         Suivant →
                     </a>
                 {% endif %}

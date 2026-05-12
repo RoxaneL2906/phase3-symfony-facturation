@@ -33,7 +33,7 @@ class InvoiceRepository extends ServiceEntityRepository
             ->getSingleScalarResult();
     }
 
-    public function createUserQueryBuilder(User $user, ?string $status = null): QueryBuilder
+    public function createUserQueryBuilder(User $user, ?string $status = null, array $filters = []): QueryBuilder
     {
         $qb = $this->createQueryBuilder('i')
             ->andWhere('i.user = :user')
@@ -43,6 +43,45 @@ class InvoiceRepository extends ServiceEntityRepository
         if ($status) {
             $qb->andWhere('i.status = :status')
                ->setParameter('status', $status);
+        }
+
+        if (!empty($filters['client'])) {
+            $qb->andWhere('i.client = :client')
+               ->setParameter('client', $filters['client']);
+        }
+
+        if (!empty($filters['month']) && !empty($filters['year'])) {
+            $start = new \DateTimeImmutable($filters['year'] . '-' . $filters['month'] . '-01 00:00:00');
+            $end = $start->modify('last day of this month')->setTime(23, 59, 59);
+            $qb->andWhere('i.createdAt >= :start')
+               ->andWhere('i.createdAt <= :end')
+               ->setParameter('start', $start)
+               ->setParameter('end', $end);
+        } elseif (!empty($filters['month'])) {
+            $year = date('Y');
+            $start = new \DateTimeImmutable($year . '-' . $filters['month'] . '-01 00:00:00');
+            $end = $start->modify('last day of this month')->setTime(23, 59, 59);
+            $qb->andWhere('i.createdAt >= :start')
+               ->andWhere('i.createdAt <= :end')
+               ->setParameter('start', $start)
+               ->setParameter('end', $end);
+        } elseif (!empty($filters['year'])) {
+            $start = new \DateTimeImmutable($filters['year'] . '-01-01 00:00:00');
+            $end = new \DateTimeImmutable($filters['year'] . '-12-31 23:59:59');
+            $qb->andWhere('i.createdAt >= :start')
+               ->andWhere('i.createdAt <= :end')
+               ->setParameter('start', $start)
+               ->setParameter('end', $end);
+        }
+
+        if (!empty($filters['date_from'])) {
+            $qb->andWhere('i.createdAt >= :date_from')
+               ->setParameter('date_from', new \DateTimeImmutable($filters['date_from'] . ' 00:00:00'));
+        }
+
+        if (!empty($filters['date_to'])) {
+            $qb->andWhere('i.createdAt <= :date_to')
+               ->setParameter('date_to', new \DateTimeImmutable($filters['date_to'] . ' 23:59:59'));
         }
 
         return $qb;
