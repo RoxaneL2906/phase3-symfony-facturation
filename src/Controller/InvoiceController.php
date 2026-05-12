@@ -287,9 +287,10 @@ Coordonnées bancaires : ' . $invoice->getUser()->getIban(),
         $now = new \DateTimeImmutable();
         $year = $now->format('Y');
         $month = $now->format('m');
+        $day = $now->format('d');
 
         $count = $invoiceRepository->countByMonth((int)$year, (int)$month);
 
-        return sprintf('FACT-%s%s-%d', $year, $month, $count + 1);
+        return sprintf('FACT-%s%s%s-%d', $year, $month, $day, $count + 1);
     }
 }
