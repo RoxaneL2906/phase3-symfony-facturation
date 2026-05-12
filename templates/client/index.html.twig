@@ -15,22 +15,22 @@
         <table class="w-full">
             <thead>
                 <tr class="border-b border-gray-100">
-                    <th class="text-left text-sm font-medium text-gray-500 px-6 py-4">Nom</th>
-                    <th class="text-left text-sm font-medium text-gray-500 px-6 py-4">Contact</th>
-                    <th class="text-left text-sm font-medium text-gray-500 px-6 py-4">Adresse</th>
-                    <th class="text-right text-sm font-medium text-gray-500 px-6 py-4">Actions</th>
+                    <th class="text-left text-sm font-medium text-gray-500 px-6 py-3">Nom</th>
+                    <th class="text-left text-sm font-medium text-gray-500 px-6 py-3">Contact</th>
+                    <th class="text-left text-sm font-medium text-gray-500 px-6 py-3">Adresse</th>
+                    <th class="text-right text-sm font-medium text-gray-500 px-6 py-3">Actions</th>
                 </tr>
             </thead>
             <tbody>
                 {% for client in clients %}
                 <tr class="border-b border-gray-50 hover:bg-gray-50 transition">
-                    <td class="px-6 py-4 text-sm font-medium text-gray-800">{{ client.name }}</td>
-                    <td class="px-6 py-4 text-sm text-gray-500">
+                    <td class="px-6 py-2 text-sm font-medium text-gray-800">{{ client.name }}</td>
+                    <td class="px-6 py-2 text-sm text-gray-500">
                         {{ client.email }}<br>
                         {{ client.phone }}
                     </td>
-                    <td class="px-6 py-4 text-sm text-gray-500">{{ client.address }}</td>
-                    <td class="px-6 py-4">
+                    <td class="px-6 py-2 text-sm text-gray-500">{{ client.address }}</td>
+                    <td class="px-6 py-2">
                         <div class="flex items-center justify-end gap-3">
                             <a href="{{ path('app_client_edit', {'id': client.id}) }}" class="text-blue-500 hover:text-blue-700">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
@@ -46,6 +46,32 @@
                 {% endfor %}
             </tbody>
         </table>
+
+        {% if clients.haveToPaginate %}
+        <div class="flex items-center justify-between px-6 py-4 border-t border-gray-100">
+            <p class="text-sm text-gray-500">
+                Page {{ clients.currentPage }} sur {{ clients.nbPages }}
+                ({{ clients.nbResults }} clients)
+            </p>
+            <div class="flex gap-2">
+                {% if clients.hasPreviousPage %}
+                    <a href="{{ path('app_client_index', {'page': clients.previousPage}) }}" class="px-3 py-1.5 text-sm text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition">
+                        ← Précédent
+                    </a>
+                {% endif %}
+                {% for page in range(1, clients.nbPages) %}
+                    <a href="{{ path('app_client_index', {'page': page}) }}" class="px-3 py-1.5 text-sm rounded-lg transition {{ page == clients.currentPage ? 'bg-blue-600 text-white' : 'text-gray-600 border border-gray-300 hover:bg-gray-50' }}">
+                        {{ page }}
+                    </a>
+                {% endfor %}
+                {% if clients.hasNextPage %}
+                    <a href="{{ path('app_client_index', {'page': clients.nextPage}) }}" class="px-3 py-1.5 text-sm text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition">
+                        Suivant →
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
     </div>
 </div>
 {% endblock %}
