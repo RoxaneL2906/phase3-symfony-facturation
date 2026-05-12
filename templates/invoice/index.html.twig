@@ -65,6 +65,32 @@
                 {% endfor %}
             </tbody>
         </table>
+
+        {% if invoices.haveToPaginate %}
+        <div class="flex items-center justify-between px-6 py-4 border-t border-gray-100">
+            <p class="text-sm text-gray-500">
+                Page {{ invoices.currentPage }} sur {{ invoices.nbPages }}
+                ({{ invoices.nbResults }} factures)
+            </p>
+            <div class="flex gap-2">
+                {% if invoices.hasPreviousPage %}
+                    <a href="{{ path('app_invoice_index', {'page': invoices.previousPage, 'status': currentStatus}) }}" class="px-3 py-1.5 text-sm text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition">
+                        ← Précédent
+                    </a>
+                {% endif %}
+                {% for page in range(1, invoices.nbPages) %}
+                    <a href="{{ path('app_invoice_index', {'page': page, 'status': currentStatus}) }}" class="px-3 py-1.5 text-sm rounded-lg transition {{ page == invoices.currentPage ? 'bg-blue-600 text-white' : 'text-gray-600 border border-gray-300 hover:bg-gray-50' }}">
+                        {{ page }}
+                    </a>
+                {% endfor %}
+                {% if invoices.hasNextPage %}
+                    <a href="{{ path('app_invoice_index', {'page': invoices.nextPage, 'status': currentStatus}) }}" class="px-3 py-1.5 text-sm text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition">
+                        Suivant →
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
     </div>
 </div>
 {% endblock %}
