@@ -154,12 +154,18 @@ final class InvoiceForm
         }
 
         $client = $this->clientRepository->find($this->selectedClientId);
+
+        if (!$client || $client->getUser() !== $this->security->getUser()) {
+            $this->error = 'Client invalide.';
+            return null;
+        }
+
         $isNew = !$this->invoice->getId();
 
         if ($isNew) {
             $now = new \DateTimeImmutable($this->invoiceDate);
             $count = $this->invoiceRepository->countByMonth((int)$now->format('Y'), (int)$now->format('m'));
-            $this->invoice->setNumber(sprintf('FACT-%s%s-%d', $now->format('Y'), $now->format('m'), $count + 1));
+            $this->invoice->setNumber(sprintf('FACT-%s%s%s-%d', $now->format('Y'), $now->format('m'), $now->format('d'), $count + 1));
             $this->invoice->setStatus('draft');
             $this->invoice->setCreatedAt($now);
             $this->invoice->setTotalTtc(0);
