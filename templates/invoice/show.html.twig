@@ -20,6 +20,10 @@
             <p class="text-sm text-gray-500 mt-1">Date : {{ invoice.createdAt|date('d/m/Y') }}</p>
         </div>
         <div class="flex gap-3">
+            <button onclick="document.getElementById('previewModal').classList.remove('hidden')" class="px-4 py-2 text-sm text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                Aperçu
+            </button>
             {% if invoice.status != 'draft' %}
                 <a href="{{ path('app_invoice_pdf', {'id': invoice.id}) }}" class="px-4 py-2 text-sm text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition flex items-center gap-2">
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
@@ -133,6 +137,94 @@
             </div>
         </div>
         {% endif %}
+    </div>
+</div>
+
+<div id="previewModal" class="hidden fixed inset-0 z-50 flex items-center justify-center" style="background-color: rgba(0,0,0,0.5);">
+    <div class="bg-white rounded-xl shadow-xl w-full max-w-3xl mx-4 max-h-screen overflow-y-auto">
+        <div class="flex items-center justify-between p-6 border-b border-gray-100">
+            <h2 class="text-lg font-bold text-gray-800">Aperçu de la facture</h2>
+            <button onclick="document.getElementById('previewModal').classList.add('hidden')" class="text-gray-400 hover:text-gray-600">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+        </div>
+
+        <div class="p-8">
+            <div class="flex justify-between mb-8">
+                <div>
+                    <p class="font-bold text-gray-800 text-lg">{{ invoice.user.companyName }}</p>
+                    <p class="text-sm text-gray-500">{{ invoice.user.firstName }} {{ invoice.user.lastName }}</p>
+                    <p class="text-sm text-gray-500">{{ invoice.user.email }}</p>
+                    {% if invoice.user.siret %}
+                        <p class="text-sm text-gray-500">SIRET : {{ invoice.user.siret }}</p>
+                    {% endif %}
+                </div>
+                <div class="text-right">
+                    <p class="font-bold text-gray-800 text-lg">FACTURE</p>
+                    <p class="text-sm text-gray-500">N° {{ invoice.number }}</p>
+                    <p class="text-sm text-gray-500">Date : {{ invoice.createdAt|date('d/m/Y') }}</p>
+                </div>
+            </div>
+
+            {% if invoice.client %}
+            <div class="bg-gray-50 rounded-lg p-4 mb-8 w-64 ml-auto">
+                <p class="text-xs text-gray-400 uppercase mb-2">Facturé à</p>
+                <p class="font-bold text-gray-800">{{ invoice.client.name }}</p>
+                <p class="text-sm text-gray-500">{{ invoice.client.address }}</p>
+                <p class="text-sm text-gray-500">{{ invoice.client.email }}</p>
+                {% if invoice.client.siret %}
+                    <p class="text-sm text-gray-500">SIRET : {{ invoice.client.siret }}</p>
+                {% endif %}
+            </div>
+            {% endif %}
+
+            <table class="w-full mb-6">
+                <thead>
+                    <tr class="border-b border-gray-200">
+                        <th class="text-left text-sm font-medium text-gray-500 py-3">Description</th>
+                        <th class="text-center text-sm font-medium text-gray-500 py-3">Qté</th>
+                        <th class="text-right text-sm font-medium text-gray-500 py-3">Prix Unitaire</th>
+                        <th class="text-right text-sm font-medium text-gray-500 py-3">Total TTC</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for product in invoice.products %}
+                    <tr class="border-b border-gray-100">
+                        <td class="py-4 text-sm text-gray-800">{{ product.name }}</td>
+                        <td class="py-4 text-sm text-center text-gray-600">{{ product.quantity }}</td>
+                        <td class="py-4 text-sm text-right text-gray-600">{{ product.price }} €</td>
+                        <td class="py-4 text-sm text-right font-medium text-gray-800">{{ product.price * product.quantity }} €</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <div class="flex justify-end mb-6">
+                <div class="w-64">
+                    <div class="flex justify-between py-2 border-t border-gray-200">
+                        <span class="font-bold text-gray-800">Total TTC</span>
+                        <span class="font-bold text-gray-800">{{ invoice.totalTtc }} €</span>
+                    </div>
+                    <p class="text-xs text-gray-400 text-right mt-1">TVA non applicable, art. 293 B du CGI</p>
+                </div>
+            </div>
+
+            {% if invoice.client %}
+            <div class="border-t border-gray-100 pt-4">
+                <p class="text-sm text-gray-500 font-medium">Conditions de paiement</p>
+                <div class="bg-gray-50 rounded-lg p-3 mt-2">
+                    <p class="text-sm text-gray-500">Coordonnées bancaires pour le paiement :</p>
+                    <p class="text-sm text-gray-700 font-medium">{{ invoice.user.iban }}</p>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="flex justify-end gap-3 p-6 border-t border-gray-100">
+            <button onclick="document.getElementById('previewModal').classList.add('hidden')" class="px-4 py-2 text-sm text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition">
+                Fermer
+            </button>
+        </div>
     </div>
 </div>
 {% endblock %}
