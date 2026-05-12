@@ -3,7 +3,9 @@
 namespace App\Repository;
 
 use App\Entity\Invoice;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -29,5 +31,20 @@ class InvoiceRepository extends ServiceEntityRepository
             ->setParameter('end', $end)
             ->getQuery()
             ->getSingleScalarResult();
+    }
+
+    public function createUserQueryBuilder(User $user, ?string $status = null): QueryBuilder
+    {
+        $qb = $this->createQueryBuilder('i')
+            ->andWhere('i.user = :user')
+            ->setParameter('user', $user)
+            ->orderBy('i.id', 'DESC');
+
+        if ($status) {
+            $qb->andWhere('i.status = :status')
+               ->setParameter('status', $status);
+        }
+
+        return $qb;
     }
 }

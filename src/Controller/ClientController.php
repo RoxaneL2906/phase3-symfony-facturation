@@ -6,6 +6,8 @@ use App\Entity\Client;
 use App\Form\ClientType;
 use App\Repository\ClientRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Pagerfanta\Doctrine\ORM\QueryAdapter;
+use Pagerfanta\Pagerfanta;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -15,12 +17,18 @@ use Symfony\Component\Routing\Attribute\Route;
 final class ClientController extends AbstractController
 {
     #[Route(name: 'app_client_index', methods: ['GET'])]
-    public function index(ClientRepository $clientRepository): Response
+    public function index(ClientRepository $clientRepository, Request $request): Response
     {
-        $clients = $clientRepository->findBy(['user' => $this->getUser()]);
+        $page = $request->query->getInt('page', 1);
+
+        $qb = $clientRepository->createUserQueryBuilder($this->getUser());
+
+        $pagerfanta = new Pagerfanta(new QueryAdapter($qb));
+        $pagerfanta->setMaxPerPage(10);
+        $pagerfanta->setCurrentPage($page);
 
         return $this->render('client/index.html.twig', [
-            'clients' => $clients,
+            'clients' => $pagerfanta,
         ]);
     }
 

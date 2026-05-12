@@ -10,6 +10,8 @@ use App\Repository\ProductRepository;
 use App\Service\MailService;
 use App\Service\PdfService;
 use Doctrine\ORM\EntityManagerInterface;
+use Pagerfanta\Doctrine\ORM\QueryAdapter;
+use Pagerfanta\Pagerfanta;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -23,15 +25,16 @@ final class InvoiceController extends AbstractController
     {
         $status = $request->query->get('status');
         $user = $this->getUser();
+        $page = $request->query->getInt('page', 1);
 
-        if ($status) {
-            $invoices = $invoiceRepository->findBy(['user' => $user, 'status' => $status]);
-        } else {
-            $invoices = $invoiceRepository->findBy(['user' => $user]);
-        }
+        $qb = $invoiceRepository->createUserQueryBuilder($user, $status);
+
+        $pagerfanta = new Pagerfanta(new QueryAdapter($qb));
+        $pagerfanta->setMaxPerPage(10);
+        $pagerfanta->setCurrentPage($page);
 
         return $this->render('invoice/index.html.twig', [
-            'invoices' => $invoices,
+            'invoices' => $pagerfanta,
             'currentStatus' => $status,
         ]);
     }
