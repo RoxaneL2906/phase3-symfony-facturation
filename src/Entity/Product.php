@@ -33,6 +33,10 @@ class Product
     #[ORM\JoinColumn(nullable: true)]
     private ?Invoice $invoice = null;
 
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: true)]
+    private ?User $user = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -46,7 +50,6 @@ class Product
     public function setName(string $name): static
     {
         $this->name = $name;
-
         return $this;
     }
 
@@ -58,7 +61,6 @@ class Product
     public function setDescription(string $description): static
     {
         $this->description = $description;
-
         return $this;
     }
 
@@ -70,7 +72,6 @@ class Product
     public function setPrice(string $price): static
     {
         $this->price = $price;
-
         return $this;
     }
 
@@ -82,7 +83,6 @@ class Product
     public function setQuantity(int $quantity): static
     {
         $this->quantity = $quantity;
-
         return $this;
     }
 
@@ -94,7 +94,6 @@ class Product
     public function setUnit(string $unit): static
     {
         $this->unit = $unit;
-
         return $this;
     }
 
@@ -106,7 +105,17 @@ class Product
     public function setInvoice(?Invoice $invoice): static
     {
         $this->invoice = $invoice;
+        return $this;
+    }
 
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): static
+    {
+        $this->user = $user;
         return $this;
     }
 }

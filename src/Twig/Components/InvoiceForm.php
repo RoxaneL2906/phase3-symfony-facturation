@@ -88,7 +88,10 @@ final class InvoiceForm
 
     public function getAvailableProducts(): array
     {
-        return $this->productRepository->findBy(['invoice' => null]);
+        return $this->productRepository->findBy([
+            'invoice' => null,
+            'user' => $this->security->getUser()
+        ]);
     }
 
     public function getAvailableClients(): array
