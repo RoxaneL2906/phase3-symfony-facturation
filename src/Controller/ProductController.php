@@ -17,7 +17,10 @@ final class ProductController extends AbstractController
     #[Route(name: 'app_product_index', methods: ['GET'])]
     public function index(ProductRepository $productRepository): Response
     {
-        $products = $productRepository->findBy(['invoice' => null]);
+        $products = $productRepository->findBy([
+            'invoice' => null,
+            'user' => $this->getUser()
+        ]);
 
         return $this->render('product/index.html.twig', [
             'products' => $products,
@@ -28,6 +31,8 @@ final class ProductController extends AbstractController
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
         $product = new Product();
+        $product->setUser($this->getUser());
+
         $form = $this->createForm(ProductType::class, $product);
         $form->handleRequest($request);
 
@@ -47,6 +52,10 @@ final class ProductController extends AbstractController
     #[Route('/{id}', name: 'app_product_show', methods: ['GET'])]
     public function show(Product $product): Response
     {
+        if ($product->getUser() !== $this->getUser()) {
+            throw $this->createAccessDeniedException();
+        }
+
         return $this->render('product/show.html.twig', [
             'product' => $product,
         ]);
@@ -55,6 +64,10 @@ final class ProductController extends AbstractController
     #[Route('/{id}/edit', name: 'app_product_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Product $product, EntityManagerInterface $entityManager): Response
     {
+        if ($product->getUser() !== $this->getUser()) {
+            throw $this->createAccessDeniedException();
+        }
+
         $form = $this->createForm(ProductType::class, $product);
         $form->handleRequest($request);
 
@@ -73,6 +86,10 @@ final class ProductController extends AbstractController
     #[Route('/{id}', name: 'app_product_delete', methods: ['POST'])]
     public function delete(Request $request, Product $product, EntityManagerInterface $entityManager): Response
     {
+        if ($product->getUser() !== $this->getUser()) {
+            throw $this->createAccessDeniedException();
+        }
+
         if ($this->isCsrfTokenValid('delete'.$product->getId(), $request->getPayload()->getString('_token'))) {
             $entityManager->remove($product);
             $entityManager->flush();

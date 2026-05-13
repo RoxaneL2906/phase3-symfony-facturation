@@ -36,7 +36,7 @@ final class DashboardController extends AbstractController
 
         $pendingInvoices = count($invoiceRepository->findBy(['user' => $user, 'status' => 'pending_payment']));
         $totalClients = count($clientRepository->findBy(['user' => $user]));
-        $totalProducts = count($productRepository->findBy(['invoice' => null]));
+        $totalProducts = count($productRepository->findBy(['invoice' => null, 'user' => $user]));
 
         $monthlyData = array_fill(1, 12, 0);
         $paidInvoices = $invoiceRepository->findBy(['user' => $user, 'status' => 'paid']);
