@@ -57,16 +57,10 @@
             {% if invoice.status == 'pending_payment' %}
                 <form method="post" action="{{ path('app_invoice_pay', {'id': invoice.id}) }}" id="payForm" style="display:inline">
                     <input type="hidden" name="_token" value="{{ csrf_token('pay' ~ invoice.id) }}">
-                    <button type="button" onclick="openConfirmModal(document.getElementById('payForm'))" class="px-4 py-2 text-sm bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition">
+                    <button type="button" onclick="openPayConfirmModal()" class="px-4 py-2 text-sm bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition">
                         Valider le paiement
                     </button>
                 </form>
-                {{ include('shared/confirm_modal.html.twig', {
-                    confirmTitle: 'Marquer comme payée',
-                    confirmMessage: 'Êtes-vous sûr de vouloir marquer cette facture comme payée ? Cette action est irréversible.',
-                    confirmButton: 'Confirmer le paiement',
-                    confirmClass: 'bg-green-600 hover:bg-green-700 text-white'
-                }) }}
             {% endif %}
         </div>
     </div>
@@ -140,6 +134,25 @@
     </div>
 </div>
 
+
+{% if invoice.status == 'pending_payment' %}
+<div id="payConfirmModal" class="hidden fixed inset-0 flex items-center justify-center z-50" style="background-color: rgba(0,0,0,0.5);">
+    <div class="bg-white rounded-xl p-6 w-80 shadow-xl">
+        <h3 class="text-lg font-bold text-gray-800 mb-2">Marquer comme payée</h3>
+        <p class="text-sm text-gray-500 mb-6">Êtes-vous sûr de vouloir marquer cette facture comme payée ? Cette action est irréversible.</p>
+        <div class="flex gap-3 justify-end">
+            <button onclick="document.getElementById('payConfirmModal').classList.add('hidden')" class="px-4 py-2 text-sm text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition">
+                Annuler
+            </button>
+            <button onclick="document.getElementById('payForm').submit()" class="px-4 py-2 text-sm font-semibold rounded-lg transition bg-green-600 hover:bg-green-700 text-white">
+                Confirmer le paiement
+            </button>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+
 <div id="previewModal" class="hidden fixed inset-0 z-50 flex items-center justify-center" style="background-color: rgba(0,0,0,0.5);">
     <div class="bg-white rounded-xl shadow-xl w-full max-w-3xl mx-4 max-h-screen overflow-y-auto">
         <div class="flex items-center justify-between p-6 border-b border-gray-100">
@@ -148,7 +161,6 @@
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
             </button>
         </div>
-
         <div class="p-8">
             <div class="flex justify-between mb-8">
                 <div>
@@ -165,7 +177,6 @@
                     <p class="text-sm text-gray-500">Date : {{ invoice.createdAt|date('d/m/Y') }}</p>
                 </div>
             </div>
-
             {% if invoice.client %}
             <div class="bg-gray-50 rounded-lg p-4 mb-8 w-64 ml-auto">
                 <p class="text-xs text-gray-400 uppercase mb-2">Facturé à</p>
@@ -177,7 +188,6 @@
                 {% endif %}
             </div>
             {% endif %}
-
             <table class="w-full mb-6">
                 <thead>
                     <tr class="border-b border-gray-200">
@@ -198,7 +208,6 @@
                     {% endfor %}
                 </tbody>
             </table>
-
             <div class="flex justify-end mb-6">
                 <div class="w-64">
                     <div class="flex justify-between py-2 border-t border-gray-200">
@@ -208,7 +217,6 @@
                     <p class="text-xs text-gray-400 text-right mt-1">TVA non applicable, art. 293 B du CGI</p>
                 </div>
             </div>
-
             {% if invoice.client %}
             <div class="border-t border-gray-100 pt-4">
                 <p class="text-sm text-gray-500 font-medium">Conditions de paiement</p>
@@ -219,7 +227,6 @@
             </div>
             {% endif %}
         </div>
-
         <div class="flex justify-end gap-3 p-6 border-t border-gray-100">
             <button onclick="document.getElementById('previewModal').classList.add('hidden')" class="px-4 py-2 text-sm text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition">
                 Fermer
@@ -227,4 +234,11 @@
         </div>
     </div>
 </div>
+
+<script>
+function openPayConfirmModal() {
+    document.getElementById('payConfirmModal').classList.remove('hidden');
+}
+</script>
+
 {% endblock %}

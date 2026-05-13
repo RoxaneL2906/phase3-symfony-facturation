@@ -1,0 +1,31 @@
+<div id="bulkActions" class="hidden bg-blue-50 border border-blue-200 rounded-xl p-4 mb-4 flex items-center justify-between">
+    <p class="text-sm text-blue-700 font-medium"><span id="selectedCount">0</span> facture(s) sélectionnée(s)</p>
+    <div class="flex gap-2">
+        <form method="post" action="{{ path('app_invoice_bulk_pdf') }}" id="bulkPdfForm">
+            <input type="hidden" name="status" value="{{ currentStatus }}">
+            <div id="bulkPdfIds"></div>
+            <button id="btnBulkPdf" type="button" disabled class="px-3 py-1.5 text-sm border rounded-lg flex items-center gap-2 transition disabled:opacity-40 disabled:cursor-not-allowed text-gray-600 border-gray-300 hover:bg-gray-50">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                Télécharger PDFs
+            </button>
+        </form>
+        <form method="post" action="{{ path('app_invoice_bulk_pay') }}" id="bulkPayForm">
+            <input type="hidden" name="status" value="{{ currentStatus }}">
+            <div id="bulkPayIds"></div>
+            <input type="hidden" name="_token" value="{{ csrf_token('bulk_pay') }}">
+            <button id="btnBulkPay" type="button" disabled class="px-3 py-1.5 text-sm border rounded-lg flex items-center gap-2 transition disabled:opacity-40 disabled:cursor-not-allowed text-green-600 border-green-300 hover:bg-green-50">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                Marquer payées
+            </button>
+        </form>
+        <form method="post" action="{{ path('app_invoice_bulk_delete') }}" id="bulkDeleteForm">
+            <input type="hidden" name="status" value="{{ currentStatus }}">
+            <div id="bulkDeleteIds"></div>
+            <input type="hidden" name="_token" value="{{ csrf_token('bulk_delete') }}">
+            <button id="btnBulkDelete" type="button" disabled class="px-3 py-1.5 text-sm border rounded-lg flex items-center gap-2 transition disabled:opacity-40 disabled:cursor-not-allowed text-red-600 border-red-300 hover:bg-red-50">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                Supprimer
+            </button>
+        </form>
+    </div>
+</div>

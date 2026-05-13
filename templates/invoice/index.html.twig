@@ -18,68 +18,11 @@
         </a>
     </div>
 
-    <div class="bg-white rounded-xl shadow-sm mb-4 p-4">
-        <form method="get" action="{{ path('app_invoice_index') }}" id="filterForm" class="flex flex-wrap gap-3 items-end">
-            {% if currentStatus %}
-                <input type="hidden" name="status" value="{{ currentStatus }}">
-            {% endif %}
+    {{ include('invoice/_filters.html.twig') }}
 
-            <div>
-                <label class="block text-xs text-gray-500 mb-1">Client</label>
-                <select name="client" onchange="document.getElementById('filterForm').submit()" class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    <option value="">Tous les clients</option>
-                    {% for client in clients %}
-                        <option value="{{ client.id }}" {% if filters.client == (client.id ~ '') %}selected{% endif %}>
-                            {{ client.name }}
-                        </option>
-                    {% endfor %}
-                </select>
-            </div>
-
-            <div>
-                <label class="block text-xs text-gray-500 mb-1">Mois</label>
-                <select name="month" onchange="document.getElementById('filterForm').submit()" class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    <option value="">Tous les mois</option>
-                    <option value="01" {% if filters.month == '01' %}selected{% endif %}>Janvier</option>
-                    <option value="02" {% if filters.month == '02' %}selected{% endif %}>Février</option>
-                    <option value="03" {% if filters.month == '03' %}selected{% endif %}>Mars</option>
-                    <option value="04" {% if filters.month == '04' %}selected{% endif %}>Avril</option>
-                    <option value="05" {% if filters.month == '05' %}selected{% endif %}>Mai</option>
-                    <option value="06" {% if filters.month == '06' %}selected{% endif %}>Juin</option>
-                    <option value="07" {% if filters.month == '07' %}selected{% endif %}>Juillet</option>
-                    <option value="08" {% if filters.month == '08' %}selected{% endif %}>Août</option>
-                    <option value="09" {% if filters.month == '09' %}selected{% endif %}>Septembre</option>
-                    <option value="10" {% if filters.month == '10' %}selected{% endif %}>Octobre</option>
-                    <option value="11" {% if filters.month == '11' %}selected{% endif %}>Novembre</option>
-                    <option value="12" {% if filters.month == '12' %}selected{% endif %}>Décembre</option>
-                </select>
-            </div>
-
-            <div>
-                <label class="block text-xs text-gray-500 mb-1">Année</label>
-                <select name="year" onchange="document.getElementById('filterForm').submit()" class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    <option value="">Toutes les années</option>
-                    {% for year in range('now'|date('Y'), 'now'|date('Y') - 4) %}
-                        <option value="{{ year }}" {% if filters.year == (year ~ '') %}selected{% endif %}>{{ year }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-
-            <div>
-                <label class="block text-xs text-gray-500 mb-1">Du</label>
-                <input type="date" name="date_from" value="{{ filters.date_from }}" onchange="document.getElementById('filterForm').submit()" class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-            </div>
-
-            <div>
-                <label class="block text-xs text-gray-500 mb-1">Au</label>
-                <input type="date" name="date_to" value="{{ filters.date_to }}" onchange="document.getElementById('filterForm').submit()" class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-            </div>
-
-            <a href="{{ path('app_invoice_index', currentStatus ? {'status': currentStatus} : {}) }}" class="px-4 py-2 text-sm text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition">
-                Réinitialiser
-            </a>
-        </form>
-    </div>
+    {% if currentStatus %}
+        {{ include('invoice/_bulk_actions.html.twig') }}
+    {% endif %}
 
     <div class="bg-white rounded-xl shadow-sm">
         <div class="flex gap-2 p-4 border-b border-gray-100">
@@ -92,6 +35,11 @@
         <table class="w-full">
             <thead>
                 <tr class="border-b border-gray-100">
+                    {% if currentStatus %}
+                    <th class="text-left px-6 py-4">
+                        <input type="checkbox" id="selectAll" class="rounded" onchange="toggleAll(this)">
+                    </th>
+                    {% endif %}
                     <th class="text-left text-sm font-medium text-gray-500 px-6 py-4">Numéro</th>
                     <th class="text-left text-sm font-medium text-gray-500 px-6 py-4">Date</th>
                     <th class="text-left text-sm font-medium text-gray-500 px-6 py-4">Client</th>
@@ -103,6 +51,11 @@
             <tbody>
                 {% for invoice in invoices %}
                 <tr class="border-b border-gray-50 hover:bg-gray-50 transition">
+                    {% if currentStatus %}
+                    <td class="px-6 py-4">
+                        <input type="checkbox" class="invoice-checkbox rounded" value="{{ invoice.id }}" data-status="{{ invoice.status }}" onchange="updateBulkActions()">
+                    </td>
+                    {% endif %}
                     <td class="px-6 py-4 text-sm font-medium text-gray-800">{{ invoice.number }}</td>
                     <td class="px-6 py-4 text-sm text-gray-500">{{ invoice.createdAt|date('d/m/Y') }}</td>
                     <td class="px-6 py-4 text-sm text-gray-500">{{ invoice.client ? invoice.client.name : '-' }}</td>
@@ -133,7 +86,7 @@
                 </tr>
                 {% else %}
                 <tr>
-                    <td colspan="6" class="px-6 py-8 text-center text-sm text-gray-400">Aucune facture trouvée</td>
+                    <td colspan="{{ currentStatus ? 7 : 6 }}" class="px-6 py-8 text-center text-sm text-gray-400">Aucune facture trouvée</td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -147,19 +100,13 @@
             </p>
             <div class="flex gap-2">
                 {% if invoices.hasPreviousPage %}
-                    <a href="{{ path('app_invoice_index', {'page': invoices.previousPage, 'status': currentStatus}|merge(activeFilters)) }}" class="px-3 py-1.5 text-sm text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition">
-                        ← Précédent
-                    </a>
+                    <a href="{{ path('app_invoice_index', {'page': invoices.previousPage, 'status': currentStatus}|merge(activeFilters)) }}" class="px-3 py-1.5 text-sm text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition">← Précédent</a>
                 {% endif %}
                 {% for page in range(1, invoices.nbPages) %}
-                    <a href="{{ path('app_invoice_index', {'page': page, 'status': currentStatus}|merge(activeFilters)) }}" class="px-3 py-1.5 text-sm rounded-lg transition {{ page == invoices.currentPage ? 'bg-blue-600 text-white' : 'text-gray-600 border border-gray-300 hover:bg-gray-50' }}">
-                        {{ page }}
-                    </a>
+                    <a href="{{ path('app_invoice_index', {'page': page, 'status': currentStatus}|merge(activeFilters)) }}" class="px-3 py-1.5 text-sm rounded-lg transition {{ page == invoices.currentPage ? 'bg-blue-600 text-white' : 'text-gray-600 border border-gray-300 hover:bg-gray-50' }}">{{ page }}</a>
                 {% endfor %}
                 {% if invoices.hasNextPage %}
-                    <a href="{{ path('app_invoice_index', {'page': invoices.nextPage, 'status': currentStatus}|merge(activeFilters)) }}" class="px-3 py-1.5 text-sm text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition">
-                        Suivant →
-                    </a>
+                    <a href="{{ path('app_invoice_index', {'page': invoices.nextPage, 'status': currentStatus}|merge(activeFilters)) }}" class="px-3 py-1.5 text-sm text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition">Suivant →</a>
                 {% endif %}
             </div>
         </div>
@@ -167,86 +114,85 @@
     </div>
 </div>
 
-{# Modales de prévisualisation - en dehors du tableau #}
 {% for invoice in invoices %}
-<div id="preview-{{ invoice.id }}" class="hidden fixed inset-0 z-50 flex items-center justify-center" style="background-color: rgba(0,0,0,0.5);">
-    <div class="bg-white rounded-xl shadow-xl w-full max-w-3xl mx-4 max-h-screen overflow-y-auto">
-        <div class="flex items-center justify-between p-6 border-b border-gray-100">
-            <h2 class="text-lg font-bold text-gray-800">Aperçu — {{ invoice.number }}</h2>
-            <button onclick="document.getElementById('preview-{{ invoice.id }}').classList.add('hidden')" class="text-gray-400 hover:text-gray-600">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-            </button>
-        </div>
-        <div class="p-8">
-            <div class="flex justify-between mb-8">
-                <div>
-                    <p class="font-bold text-gray-800 text-lg">{{ invoice.user.companyName }}</p>
-                    <p class="text-sm text-gray-500">{{ invoice.user.firstName }} {{ invoice.user.lastName }}</p>
-                    <p class="text-sm text-gray-500">{{ invoice.user.email }}</p>
-                </div>
-                <div class="text-right">
-                    <p class="font-bold text-gray-800 text-lg">FACTURE</p>
-                    <p class="text-sm text-gray-500">N° {{ invoice.number }}</p>
-                    <p class="text-sm text-gray-500">Date : {{ invoice.createdAt|date('d/m/Y') }}</p>
-                </div>
-            </div>
-            {% if invoice.client %}
-            <div class="bg-gray-50 rounded-lg p-4 mb-8 w-64 ml-auto">
-                <p class="text-xs text-gray-400 uppercase mb-2">Facturé à</p>
-                <p class="font-bold text-gray-800">{{ invoice.client.name }}</p>
-                <p class="text-sm text-gray-500">{{ invoice.client.address }}</p>
-                <p class="text-sm text-gray-500">{{ invoice.client.email }}</p>
-            </div>
-            {% endif %}
-            <table class="w-full mb-6">
-                <thead>
-                    <tr class="border-b border-gray-200">
-                        <th class="text-left text-sm font-medium text-gray-500 py-3">Description</th>
-                        <th class="text-center text-sm font-medium text-gray-500 py-3">Qté</th>
-                        <th class="text-right text-sm font-medium text-gray-500 py-3">Prix Unitaire</th>
-                        <th class="text-right text-sm font-medium text-gray-500 py-3">Total TTC</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for product in invoice.products %}
-                    <tr class="border-b border-gray-100">
-                        <td class="py-3 text-sm text-gray-800">{{ product.name }}</td>
-                        <td class="py-3 text-sm text-center text-gray-600">{{ product.quantity }}</td>
-                        <td class="py-3 text-sm text-right text-gray-600">{{ product.price }} €</td>
-                        <td class="py-3 text-sm text-right font-medium text-gray-800">{{ product.price * product.quantity }} €</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-            <div class="flex justify-end mb-6">
-                <div class="w-64">
-                    <div class="flex justify-between py-2 border-t border-gray-200">
-                        <span class="font-bold text-gray-800">Total TTC</span>
-                        <span class="font-bold text-gray-800">{{ invoice.totalTtc }} €</span>
-                    </div>
-                    <p class="text-xs text-gray-400 text-right mt-1">TVA non applicable, art. 293 B du CGI</p>
-                </div>
-            </div>
-            {% if invoice.client %}
-            <div class="border-t border-gray-100 pt-4">
-                <p class="text-sm text-gray-500 font-medium">Conditions de paiement</p>
-                <div class="bg-gray-50 rounded-lg p-3 mt-2">
-                    <p class="text-sm text-gray-500">Coordonnées bancaires :</p>
-                    <p class="text-sm text-gray-700 font-medium">{{ invoice.user.iban }}</p>
-                </div>
-            </div>
-            {% endif %}
-        </div>
-        <div class="flex justify-end gap-3 p-6 border-t border-gray-100">
-            <a href="{{ path('app_invoice_show', {'id': invoice.id}) }}" class="px-4 py-2 text-sm text-blue-600 border border-blue-300 rounded-lg hover:bg-blue-50 transition">
-                Voir les détails
-            </a>
-            <button onclick="document.getElementById('preview-{{ invoice.id }}').classList.add('hidden')" class="px-4 py-2 text-sm text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition">
-                Fermer
-            </button>
+    {{ include('invoice/_preview_modal.html.twig') }}
+{% endfor %}
+
+<div id="deleteModal" class="hidden fixed inset-0 flex items-center justify-center z-50" style="background-color: rgba(0,0,0,0.5);">
+    <div class="bg-white rounded-xl p-6 w-80 shadow-xl">
+        <h3 class="text-lg font-bold text-gray-800 mb-2">Confirmer la suppression</h3>
+        <p class="text-sm text-gray-500 mb-6">Êtes-vous sûr de vouloir supprimer cette facture ? Cette action est irréversible.</p>
+        <div class="flex gap-3 justify-end">
+            <button onclick="closeDeleteModal()" class="px-4 py-2 text-sm text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition">Annuler</button>
+            <button id="confirmDelete" class="px-4 py-2 text-sm bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition">Supprimer</button>
         </div>
     </div>
 </div>
-{% endfor %}
+
+<script>
+var formToSubmit = null;
+
+function openDeleteModal(btn) {
+    formToSubmit = btn.closest('form');
+    document.getElementById('deleteModal').classList.remove('hidden');
+}
+
+function closeDeleteModal() {
+    document.getElementById('deleteModal').classList.add('hidden');
+    formToSubmit = null;
+}
+
+document.getElementById('confirmDelete').addEventListener('click', function() {
+    if (formToSubmit) formToSubmit.submit();
+});
+
+{% if currentStatus %}
+function updateBulkActions() {
+    const checkboxes = document.querySelectorAll('.invoice-checkbox:checked');
+    const count = checkboxes.length;
+    const bulkActions = document.getElementById('bulkActions');
+    const selectedCount = document.getElementById('selectedCount');
+
+    selectedCount.textContent = count;
+    bulkActions.classList.toggle('hidden', count === 0);
+
+    const statuses = Array.from(checkboxes).map(cb => cb.dataset.status);
+    const noneDraft = statuses.every(s => s !== 'draft');
+    const allPending = statuses.every(s => s === 'pending_payment');
+    const hasDraft = statuses.some(s => s === 'draft');
+
+    const btnPdf = document.getElementById('btnBulkPdf');
+    const btnPay = document.getElementById('btnBulkPay');
+    const btnDelete = document.getElementById('btnBulkDelete');
+
+    btnPdf.disabled = !noneDraft;
+    btnPdf.type = noneDraft ? 'submit' : 'button';
+    btnPay.disabled = !allPending;
+    btnPay.type = allPending ? 'submit' : 'button';
+    btnDelete.disabled = !hasDraft;
+    btnDelete.type = hasDraft ? 'submit' : 'button';
+
+    const ids = Array.from(checkboxes).map(cb => cb.value);
+    ['bulkPdfIds', 'bulkPayIds', 'bulkDeleteIds'].forEach(containerId => {
+        const container = document.getElementById(containerId);
+        container.innerHTML = '';
+        ids.forEach(id => {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'ids[]';
+            input.value = id;
+            container.appendChild(input);
+        });
+    });
+}
+
+function toggleAll(checkbox) {
+    document.querySelectorAll('.invoice-checkbox').forEach(cb => {
+        cb.checked = checkbox.checked;
+    });
+    updateBulkActions();
+}
+{% endif %}
+</script>
 
 {% endblock %}
