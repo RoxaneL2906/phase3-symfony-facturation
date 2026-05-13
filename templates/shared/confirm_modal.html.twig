@@ -6,7 +6,7 @@
             <button onclick="closeConfirmModal()" class="px-4 py-2 text-sm text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition">
                 Annuler
             </button>
-            <button id="confirmAction" class="px-4 py-2 text-sm font-semibold rounded-lg transition {{ confirmClass ?? 'bg-blue-600 hover:bg-blue-700 text-white' }}">
+            <button onclick="confirmModalAction()" class="px-4 py-2 text-sm font-semibold rounded-lg transition {{ confirmClass ?? 'bg-blue-600 hover:bg-blue-700 text-white' }}">
                 {{ confirmButton ?? 'Confirmer' }}
             </button>
         </div>
@@ -26,7 +26,9 @@ function closeConfirmModal() {
     formToConfirm = null;
 }
 
-document.getElementById('confirmAction').addEventListener('click', function() {
-    if (formToConfirm) formToConfirm.submit();
-});
+function confirmModalAction() {
+    if (formToConfirm) {
+        formToConfirm.submit();
+    }
+}
 </script>
