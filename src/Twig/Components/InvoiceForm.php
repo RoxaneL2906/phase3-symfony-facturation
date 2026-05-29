@@ -144,7 +144,7 @@ final class InvoiceForm
     }
 
     #[LiveAction]
-    public function save(#[LiveArg] string $action = 'draft'): RedirectResponse|null
+    public function save(#[LiveArg] string $draft = 'draft'): RedirectResponse|null
     {
         $this->error = '';
 
@@ -190,7 +190,7 @@ final class InvoiceForm
             $total += $lineData['total'];
         }
 
-        if ($action === 'validate') {
+        if ($draft === 'validate') {
             $this->invoice->setStatus('pending_payment');
         }
 

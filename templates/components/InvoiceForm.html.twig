@@ -120,10 +120,10 @@
         <a href="{{ path('app_invoice_index') }}" class="px-4 py-2 text-sm text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition">
             Annuler
         </a>
-        <button type="button" data-action="click->live#action" data-live-action-param="save" data-live-action-value="draft" class="px-4 py-2 text-sm text-blue-600 border border-blue-300 rounded-lg hover:bg-blue-50 transition">
+        <button type="button" data-action="click->live#action" data-live-action-param="save" data-live-draft-param="draft" class="px-4 py-2 text-sm text-blue-600 border border-blue-300 rounded-lg hover:bg-blue-50 transition">
             Enregistrer en brouillon
         </button>
-        <button type="button" data-action="click->live#action" data-live-action-param="save" data-live-action-value="validate" class="px-4 py-2 text-sm bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition">
+        <button type="button" data-action="click->live#action" data-live-action-param="save" data-live-draft-param="validate" class="px-4 py-2 text-sm bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition">
             Enregistrer et valider
         </button>
     </div>

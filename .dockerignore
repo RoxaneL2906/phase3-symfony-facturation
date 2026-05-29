@@ -1,0 +1,7 @@
+.git
+var/cache
+var/log
+var/data_dev.db
+vendor
+README.md
+.dockerignore

@@ -1,30 +1,37 @@
-
 services:
-###> doctrine/doctrine-bundle ###
-  database:
-    image: postgres:${POSTGRES_VERSION:-16}-alpine
+  php:
+    build: .
+    ports:
+      - "8090:80"
+    depends_on:
+      - database
+      - gotenberg
+      - mailer
+    restart: always
     environment:
-      POSTGRES_DB: ${POSTGRES_DB:-app}
-      # You should definitely change the password in production
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-!ChangeMe!}
-      POSTGRES_USER: ${POSTGRES_USER:-app}
-    healthcheck:
-      test: ["CMD", "pg_isready", "-d", "${POSTGRES_DB:-app}", "-U", "${POSTGRES_USER:-app}"]
-      timeout: 5s
-      retries: 5
-      start_period: 60s
+      DATABASE_URL: "postgresql://app:app@database:5432/app?serverVersion=16&charset=utf8&driver=pdo_pgsql"
+      MAILER_DSN: "smtp://mailer:1025"
+      GOTENBERG_DSN: "http://gotenberg:3000"
+
+  database:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: app
+      POSTGRES_PASSWORD: app
+      POSTGRES_USER: app
     volumes:
       - database_data:/var/lib/postgresql/data:rw
-      # You may use a bind-mounted host directory instead, so that it is harder to accidentally remove the volume and lose all your data!
-      # - ./docker/db/data:/var/lib/postgresql/data:rw
-###< doctrine/doctrine-bundle ###
 
-###> sensiolabs/gotenberg-bundle ###
   gotenberg:
-    image: 'gotenberg/gotenberg:8'
-###< sensiolabs/gotenberg-bundle ###
+    image: gotenberg/gotenberg:8
+
+  mailer:
+    image: axllent/mailpit
+    ports:
+      - "8025:8025"
+    environment:
+      MP_SMTP_AUTH_ACCEPT_ANY: 1
+      MP_SMTP_AUTH_ALLOW_INSECURE: 1
 
 volumes:
-###> doctrine/doctrine-bundle ###
   database_data:
-###< doctrine/doctrine-bundle ###
